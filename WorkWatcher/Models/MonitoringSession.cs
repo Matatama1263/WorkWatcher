@@ -13,7 +13,7 @@ namespace WorkWatcher.Models
         public DateTime? EndTime { get; set; }
         public TimeSpan TotalWorkTime { get; set; }
         public TimeSpan TotalDistractionTime { get; set; }
-        public TimeSpan TotalComputerTime => TotalWorkTime + TotalDistractionTime;
+        public TimeSpan TotalComputerTime { get; set; }
         public bool QuotaMet { get; set; }
         public Dictionary<string, TimeSpan> ProgramUsage { get; set; } = new();
     }
