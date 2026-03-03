@@ -8,20 +8,49 @@ namespace WorkWatcher.Models
 {
     public class Quota
     {
-        public TimeSpan RequiredWorkTime { get; set; }  // 할당량
-        public TimeSpan PunishmentThreshold { get; set; }  // 처벌 시간
-        public bool QuotaMet { get; set; }
-        public bool PunishmentActive { get; set; }
-        public bool Punishmented { get; set; }
+        private TimeSpan _requiredWorkTime;
+        public TimeSpan RequiredWorkTime
+        {
+            get => _requiredWorkTime; 
+            set { _requiredWorkTime = value; }
+        }
+
+        private TimeSpan _punishmentThreshold;
+        public TimeSpan PunishmentThreshold
+        {
+            get => _punishmentThreshold; 
+            set { _punishmentThreshold = value; }
+        }
+
+        private bool _quotaMet;
+        public bool QuotaMet
+        {
+            get => _quotaMet; 
+            set { _quotaMet = value; }
+        }
+
+        private bool _punishmentActive;
+        public bool PunishmentActive
+        {
+            get => _punishmentActive;
+            set { _punishmentActive = value; }
+        }
+
+        private bool _punishmented;
+        public bool Punishmented
+        {
+            get => _punishmented; 
+            set { _punishmented = value; }
+        }
 
 
         public void InitializeQuota(TimeSpan requiredWorkTime, TimeSpan punishmentThreshold)
         {
-            RequiredWorkTime = requiredWorkTime;
-            PunishmentThreshold = punishmentThreshold;
-            QuotaMet = false;
-            PunishmentActive = false;
-            Punishmented = false;
+            _requiredWorkTime = requiredWorkTime;
+            _punishmentThreshold = punishmentThreshold;
+            _quotaMet = false;
+            _punishmentActive = false;
+            _punishmented = false;
         }
     }
 }

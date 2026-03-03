@@ -4,9 +4,33 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WorkWatcher"
+        xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="510" Width="300">
+    <Window.DataContext>
+        <ViewModels:MainViewModel/>
+    </Window.DataContext>
     <Grid>
-
+        <Button x:Name="SettingButton" Content="설정" HorizontalAlignment="Left" Margin="250,10,0,0" VerticalAlignment="Top" Height="40" Width="40"/>
+        <Button x:Name="StatisticsButton" Content="통계" HorizontalAlignment="Left" Margin="205,10,0,0" VerticalAlignment="Top" Height="40" Width="40"/>
+        <Image x:Name="SessionPowerButton" HorizontalAlignment="Center" Height="100" VerticalAlignment="Top" Width="100" Source="/Views/powerButton.png" Margin="0,115,0,0" Cursor="Hand"/>
+        <Border BorderBrush="Black" BorderThickness="1" Margin="0,260,0,0">
+            <TabControl>
+                <TabItem Header="타이머">
+                    <Grid Background="#FFE5E5E5" UseLayoutRounding="False">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Label Content="Label" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                        <Label Content="Label" HorizontalAlignment="Left" Margin="243,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="그래프">
+                    <Grid Background="#FFE5E5E5"/>
+                </TabItem>
+            </TabControl>
+        </Border>
     </Grid>
 </Window>

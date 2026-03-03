@@ -51,14 +51,9 @@ namespace WorkWatcher.Services
         public void StartNewSession()
         {
             currentSession.StartTime = DateTime.Now;
-            currentSession.EndTime = null;
             currentSession.SessionQuota.QuotaMet = false;
             currentSession.SessionQuota.PunishmentActive = false;
             currentSession.SessionQuota.Punishmented = false;
-            currentSession.TotalWorkTime = TimeSpan.Zero;
-            currentSession.TotalDistractionTime = TimeSpan.Zero;
-            currentSession.TotalComputerTime = TimeSpan.Zero;
-            currentSession.ProgramUsage.Clear();
 
             List<string> distractionProcessNames = new List<string>();
             foreach (var program in _distractionPrograms)
