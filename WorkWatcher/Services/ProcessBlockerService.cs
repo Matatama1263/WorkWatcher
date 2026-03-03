@@ -3,31 +3,38 @@ using System.Diagnostics;
 using System.Timers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management;
 
 namespace WorkWatcher.Services
 {
     public class ProcessBlockerService
     {
-        private System.Timers.Timer _blockTimer;
         private HashSet<string> _blockedProcesses;
+        public bool isActive;
+        ManagementEventWatcher watcher;
 
         public ProcessBlockerService()
         {
-            _blockTimer = new System.Timers.Timer(500); // 0.5초마다 체크
-            _blockTimer.Elapsed += OnBlockTimerElapsed;
-            _blockedProcesses = new HashSet<string>();
+            string query = "SELECT * FROM Win32_ProcessStartTrace";
+            watcher = new ManagementEventWatcher(query);
+            _blockedProcesses = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            watcher.EventArrived += (sender, e) =>
+            {
+                if (!isActive) return;
+                string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
+
+                processName = System.IO.Path.GetFileNameWithoutExtension(processName);
+
+                if (_blockedProcesses.Contains(processName))
+                    KillProcess(processName);
+            };
+            watcher.Start();
         }
 
-        public void StartBlocking(List<string> processNames)
+        public void SetBlockedProcesses(List<string> processNames)
         {
-            _blockedProcesses = new HashSet<string>(processNames);
-            _blockTimer.Start();
-        }
-
-        public void StopBlocking()
-        {
-            _blockTimer.Stop();
-            _blockedProcesses.Clear();
+            _blockedProcesses = new HashSet<string>(processNames, StringComparer.OrdinalIgnoreCase);
         }
 
         public void AddBlockedProcess(string processName)
@@ -40,22 +47,47 @@ namespace WorkWatcher.Services
             _blockedProcesses.Remove(processName);
         }
 
-        private void OnBlockTimerElapsed(object sender, ElapsedEventArgs e)
+        public void AddBlockedProcesses(string[] processNames)
         {
-            var processes = Process.GetProcesses();
+            foreach (var name in processNames)
+            {
+                _blockedProcesses.Add(name);
+            }
+        }
+
+        public void KillProcess(string processName)
+        {
+            var processes = Process.GetProcessesByName(processName);
             foreach (var process in processes)
             {
                 try
                 {
-                    if (_blockedProcesses.Contains(process.ProcessName))
+                    process.Kill();
+                }
+                catch (Exception ex)
+                {
+                    // 예외 처리 (예: 권한 문제)
+                    Console.WriteLine($"Failed to kill process {processName}: {ex.Message}");
+                }
+            }
+        }
+
+        public void KillBlockedProcesses(List<string> processNames)
+        {
+            foreach (var name in processNames)
+            {
+                var processes = Process.GetProcessesByName(name);
+                foreach (var process in processes)
+                {
+                    try
                     {
                         process.Kill();
-                        // 옵션: 사용자에게 알림 표시
                     }
-                }
-                catch
-                {
-                    // 프로세스 종료 실패 (권한 부족 등)
+                    catch (Exception ex)
+                    {
+                        // 예외 처리 (예: 권한 문제)
+                        Console.WriteLine($"Failed to kill process {name}: {ex.Message}");
+                    }
                 }
             }
         }

@@ -18,6 +18,5 @@ namespace WorkWatcher.Models
     public class DistractionProgramInfo : ProgramInfo
     {
         public bool StrictMonitoring { get; set; }  // 강한 감시 여부
-
     }
 }

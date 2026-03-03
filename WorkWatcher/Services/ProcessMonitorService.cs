@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Timers;
 using System.Collections.Generic;
 using WorkWatcher.Models;
 
@@ -15,47 +14,50 @@ namespace WorkWatcher.Services
         [DllImport("user32.dll")]
         private static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 
-        private System.Timers.Timer _monitorTimer;
-        private string _currentActiveProcess;
-        private DateTime _lastCheckTime;
-        private List<ProgramInfo> _monitoredPrograms;
+        // 활동 감지 타이머
+        Timer timer;
+        TimeSpan preTickTime;
 
+        // 프로세스 활동 감지 이벤트
         public event EventHandler<ProcessActivityEventArgs> ProcessActivityDetected;
 
-        public ProcessMonitorService()
+        // 생성자에서 타이머 초기화
+        public ProcessMonitorService(SessionManagementService sessionManagement)
         {
-            _monitorTimer = new System.Timers.Timer(1000); // 1초마다 체크
-            _monitorTimer.Elapsed += OnTimerElapsed;
-            _monitoredPrograms = new List<ProgramInfo>();
+            timer = new Timer(TimerCallback, null, Timeout.Infinite, Timeout.Infinite);
         }
 
-        public void StartMonitoring()
-        {
-            _lastCheckTime = DateTime.Now;
-            _monitorTimer.Start();
-        }
-
-        public void StopMonitoring()
-        {
-            _monitorTimer.Stop();
-        }
-
-        private void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        // 타이머 콜백 메서드에서 현재 활성화된 프로세스를 감지하고 이벤트를 발생시킴
+        public void TimerCallback(object state)
         {
             var processName = GetActiveProcessName();
-            var elapsedTime = DateTime.Now - _lastCheckTime;
-            _lastCheckTime = DateTime.Now;
 
             if (!string.IsNullOrEmpty(processName))
             {
+
                 ProcessActivityDetected?.Invoke(this, new ProcessActivityEventArgs
                 {
                     ProcessName = processName,
-                    Duration = elapsedTime
+                    // 실제 경과 시간
+                    Duration = DateTime.Now.TimeOfDay - preTickTime
                 });
             }
+
+            preTickTime = DateTime.Now.TimeOfDay;
         }
 
+        public void StartTracking()
+        {
+            preTickTime = DateTime.Now.TimeOfDay;
+            timer.Change(0, 100);
+        }
+
+        public void StopTracking()
+        {
+            timer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        // 현재 활성화된 프로세스의 이름을 가져오는 메서드
         private string GetActiveProcessName()
         {
             try
@@ -69,11 +71,6 @@ namespace WorkWatcher.Services
             {
                 return null;
             }
-        }
-
-        public void SetMonitoredPrograms(List<ProgramInfo> programs)
-        {
-            _monitoredPrograms = programs;
         }
     }
 
