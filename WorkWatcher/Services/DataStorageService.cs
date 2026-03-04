@@ -6,13 +6,12 @@ using WorkWatcher.Models;
 
 namespace WorkWatcher.Services
 {
-    public class DataStorageService
+    public static class DataStorageService
     {
-        private readonly string _dataDirectory;
-        private readonly string _sessionsFile;
-        private readonly string _settingsFile;
-
-        public DataStorageService()
+        private static readonly string _dataDirectory;
+        private static readonly string _sessionsFile;
+        private static readonly string _settingsFile;
+        static DataStorageService()
         {
             _dataDirectory = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -27,7 +26,7 @@ namespace WorkWatcher.Services
             }
         }
 
-        public void SaveSession(MonitoringSession session)
+        public static void SaveSession(MonitoringSession session)
         {
             var sessions = LoadAllSessions();
             sessions.Add(session);
@@ -40,7 +39,7 @@ namespace WorkWatcher.Services
             File.WriteAllText(_sessionsFile, json);
         }
 
-        public List<MonitoringSession> LoadAllSessions()
+        public static List<MonitoringSession> LoadAllSessions()
         {
             if (!File.Exists(_sessionsFile))
             {
@@ -52,7 +51,7 @@ namespace WorkWatcher.Services
                    ?? new List<MonitoringSession>();
         }
 
-        public void SaveSettings(AppSettings settings)
+        public static void SaveSettings(AppSettings settings)
         {
             var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions
             {
@@ -62,7 +61,7 @@ namespace WorkWatcher.Services
             File.WriteAllText(_settingsFile, json);
         }
 
-        public AppSettings LoadSettings()
+        public static AppSettings LoadSettings()
         {
             if (!File.Exists(_settingsFile))
             {
@@ -77,7 +76,7 @@ namespace WorkWatcher.Services
     public class AppSettings
     {
         public List<ProgramInfo> MonitoredPrograms { get; set; } = new();
+        public List<DistractionProgramInfo> DistractionPrograms { get; set; } = new();
         public Quota DailyQuota { get; set; } = new();
-        public bool StartWithWindows { get; set; }
     }
 }

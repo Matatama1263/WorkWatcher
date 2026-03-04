@@ -23,9 +23,9 @@ namespace WorkWatcher.Services
 
         public bool isSessionActive;
 
-        public SessionManagementService()
+        public SessionManagementService(MonitoringSession monitoringSession)
         {
-            currentSession = new MonitoringSession();
+            currentSession = monitoringSession;
             currentQuota = new Quota();
             blocker = new ProcessBlockerService();
 
@@ -130,7 +130,7 @@ namespace WorkWatcher.Services
 
                 // 할당량 충족 여부 업데이트
                 if ((!currentSession.SessionQuota.QuotaMet) &&
-                    currentSession.TotalWorkTime >= currentQuota.RequiredWorkTime)
+                    currentSession.TotalWorkTime >= currentQuota.QuotaTime)
                 {
                     blocker.isActive = false; // 차단 해제
 
