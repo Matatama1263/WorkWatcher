@@ -14,6 +14,11 @@ namespace WorkWatcher.ViewModels
 {
     public class SettingsViewModel : Model
     {
+        public SettingsViewModel()
+        {
+            LoadSettings();
+        }
+
         public AppSettings AppSettings { get; set; }
 
         // DataGrid에 바인딩할 Observable Collection
@@ -64,11 +69,6 @@ namespace WorkWatcher.ViewModels
                 _punishmentMinutes = value;
                 OnPropertyChanged(nameof(PunishmentMinutes));
             }
-        }
-
-        public SettingsViewModel()
-        {
-            LoadSettings();
         }
 
         // 설정 로드

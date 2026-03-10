@@ -7,7 +7,13 @@
         xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels"
         mc:Ignorable="d"
         Title="FindProcessDialog" Height="400" Width="300" WindowStyle="ToolWindow" ResizeMode="NoResize">
+    <Window.DataContext>
+        <ViewModels:FindProcessDialogViewModel/>
+    </Window.DataContext>
     <Grid>
-        
+        <Button Content="결정" Click="OkButton_Click" HorizontalAlignment="Left" Margin="50,0,0,10" VerticalAlignment="Bottom" Width="50" Height="30"/>
+        <Button Content="취소" Click="CancelButton_Click" HorizontalAlignment="Left" Margin="200,0,0,10" VerticalAlignment="Bottom" Width="50" Height="30"/>
+        <ListBox x:Name="P_List" ItemsSource="{Binding ProcessNames}" Margin="10,10,10,55"/>
+
     </Grid>
 </Window>

@@ -32,8 +32,8 @@ namespace WorkWatcher.Models
             get => _startTime; 
             set
             {
-                Initialize(); // 시작 시간이 설정될 때 세션 초기화
                 _startTime = value;
+                Initialize(); // 시작 시간이 설정될 때 세션 초기화
                 OnPropertyChanged(nameof(StartTime));
             }
         }
@@ -56,7 +56,6 @@ namespace WorkWatcher.Models
             set
             {
                 _totalWorkTime = value;
-                RemainQuotaTime = SessionQuota.QuotaTime - TotalDistractionTime; // 남은 쿼터 시간 업데이트
                 OnPropertyChanged(nameof(TotalWorkTime));
             }
         }
@@ -68,7 +67,6 @@ namespace WorkWatcher.Models
             set
             {
                 _totalDistractionTime = value;
-                RemainDistractTime = SessionQuota.PunishmentThreshold - TotalDistractionTime; // 남은 방해 시간 업데이트
                 OnPropertyChanged(nameof(TotalDistractionTime));
             }
         }
@@ -92,28 +90,6 @@ namespace WorkWatcher.Models
             {
                 _sessionQuota = value;
                 OnPropertyChanged(nameof(SessionQuota));
-            }
-        }
-
-        private TimeSpan _remainQuotaTime;
-        public TimeSpan RemainQuotaTime
-        {
-            get => _remainQuotaTime; 
-            set
-            {
-                _remainQuotaTime = value;
-                OnPropertyChanged(nameof(RemainQuotaTime));
-            }
-        }
-
-        private TimeSpan _remainDistractTime;
-        public TimeSpan RemainDistractTime
-        {
-            get => _remainDistractTime; 
-            set
-            {
-                _remainDistractTime = value;
-                OnPropertyChanged(nameof(RemainDistractTime));
             }
         }
 

@@ -49,7 +49,7 @@ namespace WorkWatcher.Services
         public void StartTracking()
         {
             preTickTime = DateTime.Now.TimeOfDay;
-            timer.Change(0, 100);
+            timer.Change(0, 50);
         }
 
         public void StopTracking()

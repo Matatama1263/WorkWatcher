@@ -12,7 +12,7 @@
     </Window.DataContext>
     <Grid>
         <Label Content="작업 프로그램" HorizontalAlignment="Left" Margin="0,10,238,0" VerticalAlignment="Top" FontSize="18"/>
-        <DataGrid ItemsSource="{Binding MonitoredPrograms}" 
+        <DataGrid x:Name="MP_Grid" ItemsSource="{Binding MonitoredPrograms}" 
                   AutoGenerateColumns="False"
                   Margin="10,49,0,235" 
                   HorizontalAlignment="Left" 
@@ -23,12 +23,12 @@
                 <DataGridTextColumn Header="프로그램 이름" Binding="{Binding ProcessName}" Width="380"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button Content="탐색기로 추가" HorizontalAlignment="Left" Margin="310,24,0,0" VerticalAlignment="Top"/>
-        <Button Content="열려있는 프로세스 찾기" HorizontalAlignment="Left" Margin="173,24,0,0" VerticalAlignment="Top"/>
-        <Button Content="제거" HorizontalAlignment="Left" Margin="140,24,0,0" VerticalAlignment="Top"/>
+        <Button Content="탐색기로 추가" Click="Add_MP_D_Click" HorizontalAlignment="Left" Margin="310,24,0,0" VerticalAlignment="Top"/>
+        <Button Content="열려있는 프로세스 찾기" Click="Add_MP_FP_Click" HorizontalAlignment="Left" Margin="173,24,0,0" VerticalAlignment="Top"/>
+        <Button Content="제거" Click="Remove_MP_Click" HorizontalAlignment="Left" Margin="140,24,0,0" VerticalAlignment="Top"/>
 
         <Label Content="딴짓 프로그램" HorizontalAlignment="Left" Margin="0,235,238,0" VerticalAlignment="Top" FontSize="18"/>
-        <DataGrid ItemsSource="{Binding DistractionPrograms}" 
+        <DataGrid x:Name="DP_Grid" ItemsSource="{Binding DistractionPrograms}" 
                   AutoGenerateColumns="False"
                   Margin="10,274,0,10" 
                   HorizontalAlignment="Left" 
@@ -40,9 +40,9 @@
                 <DataGridCheckBoxColumn Header="강한 감시" Binding="{Binding StrictMonitoring}" Width="80"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button Content="탐색기로 추가" HorizontalAlignment="Left" Margin="310,249,0,0" VerticalAlignment="Top"/>
-        <Button Content="열려있는 프로세스 찾기" HorizontalAlignment="Left" Margin="173,249,0,0" VerticalAlignment="Top"/>
-        <Button Content="제거" HorizontalAlignment="Left" Margin="140,249,0,0" VerticalAlignment="Top"/>
+        <Button Content="탐색기로 추가" Click="Add_DP_D_Click" HorizontalAlignment="Left" Margin="310,249,0,0" VerticalAlignment="Top"/>
+        <Button Content="열려있는 프로세스 찾기" Click="Add_DP_FP_Click" HorizontalAlignment="Left" Margin="173,249,0,0" VerticalAlignment="Top"/>
+        <Button Content="제거" Click="Remove_DP_Click" HorizontalAlignment="Left" Margin="140,249,0,0" VerticalAlignment="Top"/>
 
 
         <Label Content="할당량 설정" HorizontalAlignment="Left" Margin="400,10,0,0" VerticalAlignment="Top" FontSize="18"/>

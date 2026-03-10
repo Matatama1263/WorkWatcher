@@ -47,12 +47,13 @@ namespace WorkWatcher.Services
 
         public void StartNewSession(AppSettings appSettings)
         {
-            currentSession.StartTime = DateTime.Now;
             currentSession.SessionQuota.QuotaMet = false;
             currentSession.SessionQuota.PunishmentActive = false;
             currentSession.SessionQuota.Punishmented = false;
             currentSession.SessionQuota.QuotaTime = appSettings.DailyQuota.QuotaTime;
             currentSession.SessionQuota.PunishmentThreshold = appSettings.DailyQuota.PunishmentThreshold;
+            currentSession.StartTime = DateTime.Now;
+
 
             SetMonitoredPrograms(appSettings.MonitoredPrograms.ToDictionary(p => p.ProcessName));
             SetDistractionPrograms(appSettings.DistractionPrograms.ToDictionary(p => p.ProcessName));
@@ -121,16 +122,11 @@ namespace WorkWatcher.Services
                     currentSession.SessionQuota.Punishmented = true;
                 }
             }
-            else // 작업 프로그램인 경우
+            else if (_monitoredPrograms.ContainsKey(e.ProcessName)) // 작업 프로그램인 경우
             {
                 // 작업 시간 업데이트
                 currentSession.TotalWorkTime += e.Duration;
-
-                // 작업 프로그램의 총 활성 시간 업데이트
-                if (_monitoredPrograms.ContainsKey(e.ProcessName))
-                {
-                    _monitoredPrograms[e.ProcessName].TotalActiveTime += e.Duration;
-                }
+                _monitoredPrograms[e.ProcessName].TotalActiveTime += e.Duration;
 
                 // 할당량 충족 여부 업데이트
                 if ((!currentSession.SessionQuota.QuotaMet) &&

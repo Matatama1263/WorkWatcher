@@ -14,7 +14,6 @@
     <Grid>
         <Button x:Name="SettingButton" Content="설정" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Height="40" Width="40" Command="{Binding SettingButtonCmd}"/>
         <Button x:Name="StatisticsButton" Content="통계" HorizontalAlignment="Right" Margin="0,10,55,0" VerticalAlignment="Top" Height="40" Width="40" Command="{Binding StatisticsButtonCmd}"/>
-        <Image x:Name="SessionPowerButton" HorizontalAlignment="Center" Height="100" VerticalAlignment="Top" Width="100" Source="/Views/powerButton.png" Margin="0,99,0,0" Cursor="Hand"/>
         <Border BorderBrush="Black" BorderThickness="1" Margin="0,260,0,0">
             <TabControl>
                 <TabItem Header="스톱워치">
@@ -26,13 +25,13 @@
                         </Grid.RowDefinitions>
                         <Label Content="총 경과 시간" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="16"/>
                         <Label x:Name="TotalTime"
-                               Content="{Binding MonitoringSession.TotalComputerTime, StringFormat={}{0:hh\\:mm\\:ss}}"
+                               Content="{Binding TCT_Text}"
                                HorizontalAlignment="Right" Margin="146,0,0,0" FontSize="36" HorizontalContentAlignment="Right" VerticalAlignment="Center"/>
                         <Label Content="작업 시간" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="16" Grid.Row="1"/>
-                        <Label x:Name="WorkTime" Content="{Binding MonitoringSession.TotalWorkTime, StringFormat={}{0:hh\\:mm\\:ss}}"
+                        <Label x:Name="WorkTime" Content="{Binding TWT_Text}"
                                HorizontalAlignment="Right" Margin="147,0,0,0" FontSize="36" HorizontalContentAlignment="Right" VerticalAlignment="Center" Grid.Row="1"/>
                         <Label Content="딴짓 시간" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="16" Grid.Row="2"/>
-                        <Label x:Name="DistractTime" Content="{Binding MonitoringSession.TotalDistractionTime, StringFormat={}{0:hh\\:mm\\:ss}}"
+                        <Label x:Name="DistractTime" Content="{Binding TDT_Text}"
                                HorizontalAlignment="Right" Margin="147,0,0,0" FontSize="36" HorizontalContentAlignment="Right" VerticalAlignment="Center" Grid.Row="2"/>
                     </Grid>
                 </TabItem>
@@ -43,10 +42,10 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Label Content="남은 할당량" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="16"/>
-                        <Label x:Name="RequiredWorkTime" Content="{Binding MonitoringSession.RemainQuotaTime, StringFormat={}{0:hh\\:mm\\:ss}}"
+                        <Label x:Name="RequiredWorkTime" Content="{Binding RQT_Text}"
                                HorizontalAlignment="Right" Margin="147,0,0,0" FontSize="36" HorizontalContentAlignment="Right" VerticalAlignment="Center"/>
                         <Label Content="남은 딴짓 시간" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="16" Grid.Row="1"/>
-                        <Label x:Name="PunishmentTime" Content="{Binding MonitoringSession.RemainDistractTime, StringFormat={}{0:hh\\:mm\\:ss}}"
+                        <Label x:Name="PunishmentTime" Content="{Binding RDT_Text}"
                                HorizontalAlignment="Right" Margin="147,0,0,0" FontSize="36" HorizontalContentAlignment="Right" VerticalAlignment="Center" Grid.Row="1"/>
                     </Grid>
 
@@ -62,9 +61,6 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Label Content="총 시간 비율" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0"/>
-                        <Label Content="작업" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1"/>
-                        <Label Content="딴짓" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="2"/>
 
                         <lvc:PieChart Grid.Row="1" Grid.Column="0" Margin="5" Series="{Binding TotalTimeSeriesCollection}" LegendLocation="Bottom"/>
                         <lvc:PieChart Grid.Row="1" Grid.Column="1" Margin="5" Series="{Binding WorkTimeSeriesCollection}" LegendLocation="Bottom"/>
@@ -73,5 +69,9 @@
                 </TabItem>
             </TabControl>
         </Border>
+        <Button Command="{Binding SessionSwitchButtonCommand}" HorizontalAlignment="Center" Margin="0,86,0,0" VerticalAlignment="Top" Height="100" Width="100" BorderBrush="{x:Null}" Cursor="Hand" Background="White">
+            <Image Source="/Views/powerButton.png"></Image>
+        </Button>
+
     </Grid>
 </Window>
