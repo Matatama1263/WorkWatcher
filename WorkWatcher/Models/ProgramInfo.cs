@@ -10,18 +10,6 @@ namespace WorkWatcher.Models
 {
     public class ProgramInfo : Model
     {
-
-        // 프로그램 위치
-        private string _name;
-        public string Name
-        {
-            get => _name; 
-            set
-            {
-                _name = value;
-                OnPropertyChanged(nameof(Name));
-            }
-        }
         // 프로그램 이름 (예: "Google Chrome", "Visual Studio")
         private string _processName;
         public string ProcessName

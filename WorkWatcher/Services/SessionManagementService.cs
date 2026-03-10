@@ -12,8 +12,6 @@ namespace WorkWatcher.Services
         MonitoringSession currentSession;
         ProcessMonitorService processMonitor;
 
-        public Quota currentQuota;
-
         // 감시할 프로그램과 방해 프로그램 리스트
         public Dictionary<string, ProgramInfo> _monitoredPrograms;
         public Dictionary<string, DistractionProgramInfo> _distractionPrograms;
@@ -26,7 +24,6 @@ namespace WorkWatcher.Services
         public SessionManagementService(MonitoringSession monitoringSession)
         {
             currentSession = monitoringSession;
-            currentQuota = new Quota();
             blocker = new ProcessBlockerService();
 
             _monitoredPrograms = new Dictionary<string, ProgramInfo>();
@@ -48,12 +45,17 @@ namespace WorkWatcher.Services
             _distractionPrograms = programs;
         }
 
-        public void StartNewSession()
+        public void StartNewSession(AppSettings appSettings)
         {
             currentSession.StartTime = DateTime.Now;
             currentSession.SessionQuota.QuotaMet = false;
             currentSession.SessionQuota.PunishmentActive = false;
             currentSession.SessionQuota.Punishmented = false;
+            currentSession.SessionQuota.QuotaTime = appSettings.DailyQuota.QuotaTime;
+            currentSession.SessionQuota.PunishmentThreshold = appSettings.DailyQuota.PunishmentThreshold;
+
+            SetMonitoredPrograms(appSettings.MonitoredPrograms.ToDictionary(p => p.ProcessName));
+            SetDistractionPrograms(appSettings.DistractionPrograms.ToDictionary(p => p.ProcessName));
 
             List<string> distractionProcessNames = new List<string>();
             foreach (var program in _distractionPrograms)
@@ -77,6 +79,8 @@ namespace WorkWatcher.Services
             blocker.isActive = false;
 
             processMonitor.StopTracking();
+
+            DataStorageService.SaveSession(currentSession);
 
             isSessionActive = false;
         }
@@ -107,7 +111,7 @@ namespace WorkWatcher.Services
                 // 처벌시간 이상이면 처벌 활성화
                 if ((!currentSession.SessionQuota.QuotaMet) &&
                     (!currentSession.SessionQuota.PunishmentActive) &&
-                    currentSession.TotalDistractionTime >= currentQuota.PunishmentThreshold)
+                    currentSession.TotalDistractionTime >= currentSession.SessionQuota.PunishmentThreshold)
                 {
                     // 모든 방해 프로그램 차단
                     blocker.KillBlockedProcesses(_distractionPrograms.Keys.ToList());
@@ -130,7 +134,7 @@ namespace WorkWatcher.Services
 
                 // 할당량 충족 여부 업데이트
                 if ((!currentSession.SessionQuota.QuotaMet) &&
-                    currentSession.TotalWorkTime >= currentQuota.QuotaTime)
+                    currentSession.TotalWorkTime >= currentSession.SessionQuota.QuotaTime)
                 {
                     blocker.isActive = false; // 차단 해제
 

@@ -7,10 +7,11 @@ using WorkWatcher.Bases;
 
 namespace WorkWatcher.ViewModels
 {
-    public class StatisticsViewModel : Model
+    public class FindProcessDialogViewModel : Model
     {
-        public StatisticsViewModel()
+        public FindProcessDialogViewModel()
         {
+
         }
     }
 }

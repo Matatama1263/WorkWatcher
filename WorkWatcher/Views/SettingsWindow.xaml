@@ -11,6 +11,101 @@
         <ViewModels:SettingsViewModel/>
     </Window.DataContext>
     <Grid>
-        
+        <Label Content="작업 프로그램" HorizontalAlignment="Left" Margin="0,10,238,0" VerticalAlignment="Top" FontSize="18"/>
+        <DataGrid ItemsSource="{Binding MonitoredPrograms}" 
+                  AutoGenerateColumns="False"
+                  Margin="10,49,0,235" 
+                  HorizontalAlignment="Left" 
+                  Width="380"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="프로그램 이름" Binding="{Binding ProcessName}" Width="380"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Content="탐색기로 추가" HorizontalAlignment="Left" Margin="310,24,0,0" VerticalAlignment="Top"/>
+        <Button Content="열려있는 프로세스 찾기" HorizontalAlignment="Left" Margin="173,24,0,0" VerticalAlignment="Top"/>
+        <Button Content="제거" HorizontalAlignment="Left" Margin="140,24,0,0" VerticalAlignment="Top"/>
+
+        <Label Content="딴짓 프로그램" HorizontalAlignment="Left" Margin="0,235,238,0" VerticalAlignment="Top" FontSize="18"/>
+        <DataGrid ItemsSource="{Binding DistractionPrograms}" 
+                  AutoGenerateColumns="False"
+                  Margin="10,274,0,10" 
+                  HorizontalAlignment="Left" 
+                  Width="380"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="프로그램 이름" Binding="{Binding ProcessName}" Width="300"/>
+                <DataGridCheckBoxColumn Header="강한 감시" Binding="{Binding StrictMonitoring}" Width="80"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Content="탐색기로 추가" HorizontalAlignment="Left" Margin="310,249,0,0" VerticalAlignment="Top"/>
+        <Button Content="열려있는 프로세스 찾기" HorizontalAlignment="Left" Margin="173,249,0,0" VerticalAlignment="Top"/>
+        <Button Content="제거" HorizontalAlignment="Left" Margin="140,249,0,0" VerticalAlignment="Top"/>
+
+
+        <Label Content="할당량 설정" HorizontalAlignment="Left" Margin="400,10,0,0" VerticalAlignment="Top" FontSize="18"/>
+        <TextBox HorizontalAlignment="Left" 
+                 Margin="400,49,0,0" 
+                 TextWrapping="Wrap" 
+                 Text="{Binding QuotaHours, UpdateSourceTrigger=PropertyChanged}" 
+                 VerticalAlignment="Top" 
+                 Width="40" 
+                 HorizontalContentAlignment="Center" 
+                 VerticalContentAlignment="Center"/>
+        <Label Content="시간" HorizontalAlignment="Left" Margin="445,45,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <TextBox HorizontalAlignment="Left" 
+                 Margin="484,49,0,0" 
+                 TextWrapping="Wrap" 
+                 Text="{Binding QuotaMinutes, UpdateSourceTrigger=PropertyChanged}" 
+                 VerticalAlignment="Top" 
+                 Width="40" 
+                 HorizontalContentAlignment="Center" 
+                 VerticalContentAlignment="Center"/>
+        <Label Content="분" HorizontalAlignment="Left" Margin="529,45,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+        <Label Content="딴짓 허용 시간 설정" HorizontalAlignment="Left" Margin="400,107,0,0" VerticalAlignment="Top" FontSize="18"/>
+        <TextBox HorizontalAlignment="Left" 
+                 Margin="400,146,0,0" 
+                 TextWrapping="Wrap" 
+                 Text="{Binding PunishmentHours, UpdateSourceTrigger=PropertyChanged}" 
+                 VerticalAlignment="Top" 
+                 Width="40" 
+                 HorizontalContentAlignment="Center" 
+                 VerticalContentAlignment="Center"/>
+        <Label Content="시간" HorizontalAlignment="Left" Margin="445,142,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <TextBox HorizontalAlignment="Left" 
+                 Margin="484,146,0,0" 
+                 TextWrapping="Wrap" 
+                 Text="{Binding PunishmentMinutes, UpdateSourceTrigger=PropertyChanged}" 
+                 VerticalAlignment="Top" 
+                 Width="40" 
+                 HorizontalContentAlignment="Center" 
+                 VerticalContentAlignment="Center"/>
+        <Label Content="분" HorizontalAlignment="Left" Margin="529,142,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+        <Button Content="적용" 
+                HorizontalAlignment="Right" 
+                Margin="0,0,10,10" 
+                VerticalAlignment="Bottom" 
+                Height="30" 
+                Width="70"
+                Click="ApplyButton_Click"/>
+        <Button Content="취소" 
+                HorizontalAlignment="Right" 
+                Margin="0,0,85,10" 
+                VerticalAlignment="Bottom" 
+                Height="30" 
+                Width="70"
+                Click="CancelButton_Click"/>
+        <Button Content="확인" 
+                HorizontalAlignment="Right" 
+                Margin="0,0,160,10" 
+                VerticalAlignment="Bottom" 
+                Height="30" 
+                Width="70"
+                Click="OkButton_Click"/>
+
     </Grid>
 </Window>

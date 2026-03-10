@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using WorkWatcher.Bases;
 using WorkWatcher.Models;
 using WorkWatcher.Services;
@@ -23,48 +24,39 @@ namespace WorkWatcher.ViewModels
 
         public MainViewModel()
         {
-            appSettings = DataStorageService.LoadSettings();
-
             _monitoringSession = new MonitoringSession();
             sessionManagementService = new SessionManagementService(_monitoringSession);
             SessionSwitchButtonCommand = new Command(
                     executeAction: _ => SessionSwitchButtonCommandExecute(),
-                    canExecuteFunc: _ => sessionManagementService.isSessionActive
+                    canExecuteFunc: _ => !sessionManagementService.isSessionActive
             );
-                SettingButtonCmd = new Command(
-                        executeAction: _ =>
-                        {
-                            // 설정 버튼 클릭 시 동작
-                            if (settingsWindow != null && settingsWindow.IsVisible)
-                            {
-                                settingsWindow.Activate(); // 이미 열려있다면 창을 활성화
-                            }
-                            else
-                            {
-                                settingsWindow = new SettingsWindow();
-                                settingsWindow.DataContext = new SettingsViewModel(appSettings); // 설정 창에 ViewModel 연결
-                                settingsWindow.Show(); // 열려있지 않다면 창을 엶
-                            }
-                        },
-                        canExecuteFunc: _ => true
-                );
+            SettingButtonCmd = new Command(
+                    executeAction: _ =>
+                    {
+                        // 다이얼로그 창으로 열기
+                        settingsWindow = new SettingsWindow();
+                        settingsWindow.Owner = App.Current.MainWindow; // 메인 창을 소유자로 설정
+                        settingsWindow.ShowDialog(); // 열려있지 않다면 창을 엶
+                    },
+                    canExecuteFunc: _ => !sessionManagementService.isSessionActive
+            );
     
-                StatisticsButtonCmd = new Command(
-                        executeAction: _ =>
+            StatisticsButtonCmd = new Command(
+                    executeAction: _ =>
+                    {
+                        // 통계 버튼 클릭 시 동작
+                        if (statisticsWindow != null && statisticsWindow.IsVisible)
                         {
-                            // 통계 버튼 클릭 시 동작
-                            if (statisticsWindow != null && statisticsWindow.IsVisible)
-                            {
-                                statisticsWindow.Activate(); // 이미 열려있다면 창을 활성화
-                            }
-                            else
-                            {
-                                statisticsWindow = new StatisticsWindow();
-                                statisticsWindow.Show(); // 열려있지 않다면 창을 엶
-                            }
-                        },
-                        canExecuteFunc: _ => true
-                );
+                            statisticsWindow.Activate(); // 이미 열려있다면 창을 활성화
+                        }
+                        else
+                        {
+                            statisticsWindow = new StatisticsWindow();
+                            statisticsWindow.Show(); // 열려있지 않다면 창을 엶
+                        }
+                    },
+                    canExecuteFunc: _ => true
+            );
         }
 
         public MonitoringSession MonitoringSession
@@ -85,11 +77,15 @@ namespace WorkWatcher.ViewModels
         {
             if (sessionManagementService.isSessionActive)
             {
-                sessionManagementService.StartNewSession();
+                sessionManagementService.EndCurrentSession();
             }
             else
             {
-                sessionManagementService.EndCurrentSession();
+                appSettings = DataStorageService.LoadSettings();
+                if (appSettings.MonitoredPrograms.Count == 0)
+                {
+                    MessageBox.Show("모니터링할 프로그램이 설정되어 있지 않습니다. 설정에서 프로그램을 추가해주세요.", "설정 필요", MessageBoxButton.OK, MessageBoxImage.Warning);
+                } else sessionManagementService.StartNewSession(appSettings);
             }
         }
     }

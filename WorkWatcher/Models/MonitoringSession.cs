@@ -11,19 +11,29 @@ namespace WorkWatcher.Models
     public class MonitoringSession : Model
     {
 
+        public MonitoringSession()
+        {
+            _sessionQuota = new Quota();
+            Initialize(); // 생성자에서 세션 초기화
+        }
+
+        public void Initialize()
+        {
+            EndTime = null; // 세션이 시작될 때 종료 시간 초기화
+            TotalWorkTime = TimeSpan.Zero;
+            TotalDistractionTime = TimeSpan.Zero;
+            TotalComputerTime = TimeSpan.Zero;
+            ProgramUsage.Clear();
+        }
+
         private DateTime _startTime;
         public DateTime StartTime
         { 
             get => _startTime; 
             set
             {
+                Initialize(); // 시작 시간이 설정될 때 세션 초기화
                 _startTime = value;
-                EndTime = null; // 세션이 시작될 때 종료 시간 초기화
-                TotalWorkTime = TimeSpan.Zero;
-                TotalDistractionTime = TimeSpan.Zero;
-                TotalComputerTime = TimeSpan.Zero;
-                ProgramUsage.Clear();
-
                 OnPropertyChanged(nameof(StartTime));
             }
         }
