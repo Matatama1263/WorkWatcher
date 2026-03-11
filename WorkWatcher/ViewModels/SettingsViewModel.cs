@@ -22,7 +22,7 @@ namespace WorkWatcher.ViewModels
         public AppSettings AppSettings { get; set; }
 
         // DataGrid에 바인딩할 Observable Collection
-        public ObservableCollection<ProgramInfo> MonitoredPrograms { get; set; }
+        public ObservableCollection<string> MonitoredPrograms { get; set; }
         public ObservableCollection<DistractionProgramInfo> DistractionPrograms { get; set; }
 
         // 할당량 시간 입력 (시, 분)
@@ -76,7 +76,7 @@ namespace WorkWatcher.ViewModels
         {
             AppSettings = DataStorageService.LoadSettings();
 
-            MonitoredPrograms = new ObservableCollection<ProgramInfo>(AppSettings.MonitoredPrograms);
+            MonitoredPrograms = new ObservableCollection<string>(AppSettings.MonitoredPrograms);
             DistractionPrograms = new ObservableCollection<DistractionProgramInfo>(AppSettings.DistractionPrograms);
 
             // TimeSpan을 시간과 분으로 분리
@@ -102,19 +102,13 @@ namespace WorkWatcher.ViewModels
         }
 
         // 작업 프로그램 추가
-        public void AddMonitoredProgram(string processName, string pass)
+        public void AddMonitoredProgram(string program)
         {
-            var program = new ProgramInfo
-            {
-                ProcessName = processName,
-                TotalActiveTime = TimeSpan.Zero
-            };
-
             MonitoredPrograms.Add(program);
         }
 
         // 작업 프로그램 제거
-        public void RemoveMonitoredProgram(ProgramInfo program)
+        public void RemoveMonitoredProgram(string program)
         {
             if (program != null && MonitoredPrograms.Contains(program))
             {
@@ -123,12 +117,11 @@ namespace WorkWatcher.ViewModels
         }
 
         // 딴짓 프로그램 추가
-        public void AddDistractionProgram(string processName, string pass, bool strictMonitoring = false)
+        public void AddDistractionProgram(string processName, bool strictMonitoring = false)
         {
             var program = new DistractionProgramInfo
             {
                 ProcessName = processName,
-                TotalActiveTime = TimeSpan.Zero,
                 StrictMonitoring = strictMonitoring
             };
 

@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:WorkWatcher.Views"
         xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels"
         mc:Ignorable="d"
+        Closing="Window_Closing"
         Title="SettingsWindow" Height="450" Width="800" WindowStyle="ToolWindow" ResizeMode="NoResize">
     <Window.DataContext>
         <ViewModels:SettingsViewModel/>
@@ -20,7 +21,7 @@
                   CanUserAddRows="False"
                   CanUserDeleteRows="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="프로그램 이름" Binding="{Binding ProcessName}" Width="380"/>
+                <DataGridTextColumn Header="프로그램 이름" Binding="{Binding}" Width="380"/>
             </DataGrid.Columns>
         </DataGrid>
         <Button Content="탐색기로 추가" Click="Add_MP_D_Click" HorizontalAlignment="Left" Margin="310,24,0,0" VerticalAlignment="Top"/>
@@ -110,6 +111,9 @@
                 Height="30" 
                 Width="70"
                 Click="OkButton_Click"/>
+        <Label Content="(?)" HorizontalAlignment="Left" Margin="369,221,0,0" VerticalAlignment="Top" FontSize="10" ToolTip="강한 감시가 적용된 프로그램은 새션중에 실행이 불가능하게 됩니다."/>
+        <Label Content="(?)" HorizontalAlignment="Left" Margin="564,107,0,0" VerticalAlignment="Top" FontSize="10" ToolTip="허용된 딴짓 시간을 모두 사용하면 할당량을 전부 채우기 전까지 모든 딴짓 프로그램에 강한 감시가 적용됩니다."/>
+        <Label Content="(?)" HorizontalAlignment="Left" Margin="497,8,0,0" VerticalAlignment="Top" FontSize="10" ToolTip="할당량을 전부 채우면 강한 감시 상태가 모두 해제됩니다."/>
 
     </Grid>
 </Window>

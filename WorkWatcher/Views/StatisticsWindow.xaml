@@ -7,12 +7,39 @@
         xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels"
         
         mc:Ignorable="d"
-        Title="StatisticsWindow" Height="450" Width="800">
+        Closing="Window_Closing"
+        Title="통계" Height="500" Width="1000">
 
     <Window.DataContext>
         <ViewModels:StatisticsViewModel/>
     </Window.DataContext>
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="3"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <GridSplitter HorizontalAlignment="Stretch" Width="3" Grid.Column="1"/>
+        <ListView ItemsSource="{Binding Sessions}" SelectedItem="{Binding SelectedSession}" Margin="10,10,10,10" Grid.Column="0">
+            <ListView.View>
+                <GridView>
+                    <!-- 년-월-일/시:분:초 형식으로 표시 -->
+                    <GridViewColumn Header="시작 시간" DisplayMemberBinding="{Binding StartTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}" Width="110"/>
+                    <GridViewColumn Header="종료 시간" DisplayMemberBinding="{Binding EndTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}" Width="110"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Grid Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Content="새션 통계" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22"/>
+            <Label Content="시작 시간" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+            <Label Content="{Binding SelectedSession.StartTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}" HorizontalAlignment="Right" Margin="0,54,0,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+            <Label Content="종료 시간" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+            <Label Content="{Binding SelectedSession.EndTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}" HorizontalAlignment="Right" Margin="0,88,0,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+        </Grid>
     </Grid>
 </Window>

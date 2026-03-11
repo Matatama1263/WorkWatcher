@@ -9,11 +9,10 @@ namespace WorkWatcher.Services
 {
     public class SessionManagementService
     {
-        MonitoringSession currentSession;
+        public MonitoringSession currentSession;
         ProcessMonitorService processMonitor;
 
-        // 감시할 프로그램과 방해 프로그램 리스트
-        public Dictionary<string, ProgramInfo> _monitoredPrograms;
+        // 감시할 딴짓 프로그램 리스트
         public Dictionary<string, DistractionProgramInfo> _distractionPrograms;
 
         // 프로세스 차단 서비스
@@ -26,17 +25,10 @@ namespace WorkWatcher.Services
             currentSession = monitoringSession;
             blocker = new ProcessBlockerService();
 
-            _monitoredPrograms = new Dictionary<string, ProgramInfo>();
             _distractionPrograms = new Dictionary<string, DistractionProgramInfo>();
 
             processMonitor = new ProcessMonitorService(this);
             processMonitor.ProcessActivityDetected += OnProcessActivityDetected;
-        }
-
-        // 프로그램 리스트 설정 메서드
-        public void SetMonitoredPrograms(Dictionary<string, ProgramInfo> programs)
-        {
-            _monitoredPrograms = programs;
         }
 
         // 방해 프로그램 리스트 설정 메서드
@@ -47,6 +39,7 @@ namespace WorkWatcher.Services
 
         public void StartNewSession(AppSettings appSettings)
         {
+
             currentSession.SessionQuota.QuotaMet = false;
             currentSession.SessionQuota.PunishmentActive = false;
             currentSession.SessionQuota.Punishmented = false;
@@ -55,7 +48,16 @@ namespace WorkWatcher.Services
             currentSession.StartTime = DateTime.Now;
 
 
-            SetMonitoredPrograms(appSettings.MonitoredPrograms.ToDictionary(p => p.ProcessName));
+            currentSession.WorkPrograms = new Dictionary<string, TimeSpan>();
+            foreach (var program in appSettings.MonitoredPrograms)
+            {
+                currentSession.WorkPrograms.Add(program, TimeSpan.Zero);
+            }
+            currentSession.DistractionPrograms = new Dictionary<string, TimeSpan>();
+            foreach (var program in appSettings.DistractionPrograms)
+            {
+                currentSession.DistractionPrograms.Add(program.ProcessName, TimeSpan.Zero);
+            }
             SetDistractionPrograms(appSettings.DistractionPrograms.ToDictionary(p => p.ProcessName));
 
             List<string> distractionProcessNames = new List<string>();
@@ -102,12 +104,8 @@ namespace WorkWatcher.Services
             {
                 // 방해 시간 업데이트
                 currentSession.TotalDistractionTime += e.Duration;
-
-                // 방해 프로그램의 총 활성 시간 업데이트
-                if (_distractionPrograms.ContainsKey(e.ProcessName))
-                {
-                    _distractionPrograms[e.ProcessName].TotalActiveTime += e.Duration;
-                }
+                currentSession.DistractionPrograms[e.ProcessName] += e.Duration;
+                currentSession.OnPropertyChanged(nameof(currentSession.DistractionPrograms));
 
                 // 처벌시간 이상이면 처벌 활성화
                 if ((!currentSession.SessionQuota.QuotaMet) &&
@@ -122,11 +120,13 @@ namespace WorkWatcher.Services
                     currentSession.SessionQuota.Punishmented = true;
                 }
             }
-            else if (_monitoredPrograms.ContainsKey(e.ProcessName)) // 작업 프로그램인 경우
+            else if (currentSession.WorkPrograms.ContainsKey(e.ProcessName)) // 작업 프로그램인 경우
             {
                 // 작업 시간 업데이트
                 currentSession.TotalWorkTime += e.Duration;
-                _monitoredPrograms[e.ProcessName].TotalActiveTime += e.Duration;
+                currentSession.WorkPrograms[e.ProcessName] += e.Duration;
+                currentSession.OnPropertyChanged(nameof(currentSession.WorkPrograms));
+
 
                 // 할당량 충족 여부 업데이트
                 if ((!currentSession.SessionQuota.QuotaMet) &&
@@ -139,18 +139,7 @@ namespace WorkWatcher.Services
                 }
             }
 
-            // 프로그램별 사용 시간 업데이트
-            if (currentSession.ProgramUsage.ContainsKey(e.ProcessName))
-            {
-                currentSession.ProgramUsage[e.ProcessName] += e.Duration;
-            }
-            else
-            {
-                currentSession.ProgramUsage[e.ProcessName] = e.Duration;
-            }
-
             // ProgramUsage가 변경되었음을 알림
-            currentSession.OnPropertyChanged(nameof(currentSession.ProgramUsage));
         }
     }
 }

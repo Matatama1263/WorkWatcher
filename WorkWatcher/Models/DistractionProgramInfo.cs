@@ -8,35 +8,19 @@ using WorkWatcher.Bases;
 
 namespace WorkWatcher.Models
 {
-    public class ProgramInfo : Model
+    public class DistractionProgramInfo : Model
     {
         // 프로그램 이름 (예: "Google Chrome", "Visual Studio")
         private string _processName;
         public string ProcessName
         {
-            get => _processName; 
+            get => _processName;
             set
             {
                 _processName = value;
                 OnPropertyChanged(nameof(ProcessName));
             }
         }
-
-        private TimeSpan _totalActiveTime;
-
-        public TimeSpan TotalActiveTime
-        {
-            get => _totalActiveTime; 
-            set
-            {
-                _totalActiveTime = value;
-                OnPropertyChanged(nameof(TotalActiveTime));
-            }
-        }
-    }
-
-    public class DistractionProgramInfo : ProgramInfo
-    {
         // 강한 감시 여부
         private bool _strictMonitoring;
         public bool StrictMonitoring

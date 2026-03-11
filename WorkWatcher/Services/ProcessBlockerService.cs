@@ -32,6 +32,12 @@ namespace WorkWatcher.Services
             watcher.Start();
         }
 
+        ~ProcessBlockerService()
+        {
+            watcher.Stop();
+            watcher.Dispose();
+        }
+
         public void SetBlockedProcesses(List<string> processNames)
         {
             _blockedProcesses = new HashSet<string>(processNames, StringComparer.OrdinalIgnoreCase);

@@ -75,7 +75,7 @@ namespace WorkWatcher.Services
 
     public class AppSettings
     {
-        public List<ProgramInfo> MonitoredPrograms { get; set; } = new();
+        public List<string> MonitoredPrograms { get; set; } = new();
         public List<DistractionProgramInfo> DistractionPrograms { get; set; } = new();
         public Quota DailyQuota { get; set; } = new();
     }

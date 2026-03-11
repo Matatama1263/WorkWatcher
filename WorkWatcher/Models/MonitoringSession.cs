@@ -23,7 +23,6 @@ namespace WorkWatcher.Models
             TotalWorkTime = TimeSpan.Zero;
             TotalDistractionTime = TimeSpan.Zero;
             TotalComputerTime = TimeSpan.Zero;
-            ProgramUsage.Clear();
         }
 
         private DateTime _startTime;
@@ -93,14 +92,25 @@ namespace WorkWatcher.Models
             }
         }
 
-        private Dictionary<string, TimeSpan> _programUsage = new();
-        public Dictionary<string, TimeSpan> ProgramUsage
+        private Dictionary<string, TimeSpan> _workPrograms = new();
+        public Dictionary<string, TimeSpan> WorkPrograms
         {
-            get => _programUsage; 
+            get => _workPrograms; 
             set
             {
-                _programUsage = value;
-                OnPropertyChanged(nameof(ProgramUsage));
+                _workPrograms = value;
+                OnPropertyChanged(nameof(WorkPrograms));
+            }
+        }
+
+        private Dictionary<string, TimeSpan> _distractionPrograms = new();
+        public Dictionary<string, TimeSpan> DistractionPrograms
+        {
+            get => _distractionPrograms;
+            set
+            {
+                _distractionPrograms = value;
+                OnPropertyChanged(nameof(DistractionPrograms));
             }
         }
     }

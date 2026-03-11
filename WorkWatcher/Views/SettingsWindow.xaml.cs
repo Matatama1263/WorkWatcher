@@ -3,6 +3,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using System.ComponentModel;
 using WorkWatcher.Models;
 using WorkWatcher.ViewModels;
 
@@ -37,7 +38,7 @@ namespace WorkWatcher.Views
                 string selectedProcessName = findProcessDialog.SelectedProcessName;
                 if (IsValidProcessName(selectedProcessName))
                 {
-                    ViewModel.MonitoredPrograms.Add(new ProgramInfo { ProcessName = selectedProcessName });
+                    ViewModel.MonitoredPrograms.Add(selectedProcessName);
                 } else ProcessNameErrorMessage(selectedProcessName);
             }
         }
@@ -55,7 +56,7 @@ namespace WorkWatcher.Views
                 string fileName = System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName);
                 if (IsValidProcessName(fileName))
                 {
-                    ViewModel.MonitoredPrograms.Add(new ProgramInfo { ProcessName = fileName });
+                    ViewModel.MonitoredPrograms.Add(fileName);
                 } else ProcessNameErrorMessage(fileName);
             }
         }
@@ -64,7 +65,7 @@ namespace WorkWatcher.Views
         {
             if (MP_Grid.SelectedItem != null)
             {
-                ViewModel.MonitoredPrograms.Remove((ProgramInfo)MP_Grid.SelectedItem);
+                ViewModel.MonitoredPrograms.Remove((string)MP_Grid.SelectedItem);
             }
         }
 
@@ -114,7 +115,7 @@ namespace WorkWatcher.Views
             // 두 리스트중 하나라도 이미 존재하는지 확인
             foreach (var program in ViewModel.MonitoredPrograms)
             {
-                if (string.Equals(program.ProcessName, input, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(program, input, StringComparison.OrdinalIgnoreCase))
                     return false;
             }
             foreach (var program in ViewModel.DistractionPrograms)
@@ -133,12 +134,18 @@ namespace WorkWatcher.Views
                 MessageBoxImage.Warning);
         }
 
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            e.Cancel = true; // 창이 실제로 닫히는 것을 취소
+            this.Hide();     // 대신 숨김
+        }
+
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             if (ViewModel.ValidateQuota())
             {
                 ViewModel.SaveSettings();
-                this.Close();
+                this.Hide();
             }
             else
             {
@@ -170,7 +177,7 @@ namespace WorkWatcher.Views
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            this.Hide();
         }
     }
 }

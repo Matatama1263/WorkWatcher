@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,12 @@ namespace WorkWatcher.Views
         public StatisticsWindow()
         {
             InitializeComponent();
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            e.Cancel = true; // 창이 실제로 닫히는 것을 취소
+            this.Hide();     // 대신 숨김
         }
     }
 }

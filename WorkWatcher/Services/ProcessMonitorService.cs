@@ -16,7 +16,8 @@ namespace WorkWatcher.Services
 
         // 활동 감지 타이머
         Timer timer;
-        TimeSpan preTickTime;
+        DateTime lastTickTime;
+        private readonly object lockObject = new object();
 
         // 프로세스 활동 감지 이벤트
         public event EventHandler<ProcessActivityEventArgs> ProcessActivityDetected;
@@ -30,26 +31,44 @@ namespace WorkWatcher.Services
         // 타이머 콜백 메서드에서 현재 활성화된 프로세스를 감지하고 이벤트를 발생시킴
         public void TimerCallback(object state)
         {
-            var processName = GetActiveProcessName();
+            DateTime currentTime;
+            DateTime previousTime;
+            string processName;
+
+            // 스레드 안전하게 시간 정보 가져오기
+            lock (lockObject)
+            {
+                currentTime = DateTime.Now;
+                previousTime = lastTickTime;
+                lastTickTime = currentTime;
+            }
+
+            // 프로세스 이름 가져오기 (lock 외부에서 실행)
+            processName = GetActiveProcessName();
 
             if (!string.IsNullOrEmpty(processName))
             {
+                TimeSpan duration = currentTime - previousTime;
 
-                ProcessActivityDetected?.Invoke(this, new ProcessActivityEventArgs
+                // 비정상적인 시간 차이 필터링 (예: 시스템 절전 모드 복귀)
+                if (duration.TotalSeconds > 0 && duration.TotalSeconds < 10)
                 {
-                    ProcessName = processName,
-                    // 실제 경과 시간
-                    Duration = DateTime.Now.TimeOfDay - preTickTime
-                });
+                    ProcessActivityDetected?.Invoke(this, new ProcessActivityEventArgs
+                    {
+                        ProcessName = processName,
+                        Duration = duration
+                    });
+                }
             }
-
-            preTickTime = DateTime.Now.TimeOfDay;
         }
 
         public void StartTracking()
         {
-            preTickTime = DateTime.Now.TimeOfDay;
-            timer.Change(0, 50);
+            lock (lockObject)
+            {
+                lastTickTime = DateTime.Now;
+            }
+            timer.Change(0, 100);
         }
 
         public void StopTracking()
@@ -60,17 +79,32 @@ namespace WorkWatcher.Services
         // 현재 활성화된 프로세스의 이름을 가져오는 메서드
         private string GetActiveProcessName()
         {
+            Process process = null;
             try
             {
                 IntPtr hwnd = GetForegroundWindow();
+                if (hwnd == IntPtr.Zero)
+                    return null;
+
                 GetWindowThreadProcessId(hwnd, out int processId);
-                Process process = Process.GetProcessById(processId);
+                process = Process.GetProcessById(processId);
                 return process.ProcessName;
             }
             catch
             {
                 return null;
             }
+            finally
+            {
+                // 프로세스 객체 해제
+                process?.Dispose();
+            }
+        }
+
+        // IDisposable 패턴 구현
+        public void Dispose()
+        {
+            timer?.Dispose();
         }
     }
 

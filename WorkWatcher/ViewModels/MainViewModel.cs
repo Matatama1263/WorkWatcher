@@ -158,37 +158,42 @@ namespace WorkWatcher.ViewModels
             _monitoringSession = new MonitoringSession();
             sessionManagementService = new SessionManagementService(_monitoringSession);
             _monitoringSession.PropertyChanged += OnUpdateSessionData;
+            settingsWindow = new SettingsWindow(); // 생성자에서 한 번만 생성
+            statisticsWindow = new StatisticsWindow();
 
             SessionSwitchButtonCommand = new Command(
                     executeAction: _ => SessionSwitchButtonCommandExecute(),
                     canExecuteFunc: _ => true
             );
             SettingButtonCmd = new Command(
-                    executeAction: _ =>
+                executeAction: _ =>
+                {
+                    if (settingsWindow.IsVisible)
                     {
-                        // 다이얼로그 창으로 열기
-                        settingsWindow = new SettingsWindow();
-                        settingsWindow.Owner = App.Current.MainWindow; // 메인 창을 소유자로 설정
-                        settingsWindow.ShowDialog(); // 열려있지 않다면 창을 엶
-                    },
-                    canExecuteFunc: _ => !sessionManagementService.isSessionActive
+                        settingsWindow.Activate(); // 이미 열려있다면 창을 활성화
+                    }
+                    else
+                    {
+                        settingsWindow.Show(); // 같은 인스턴스 재사용
+                    }
+                },
+                canExecuteFunc: _ => !sessionManagementService.isSessionActive
             );
-    
+
             StatisticsButtonCmd = new Command(
-                    executeAction: _ =>
+                executeAction: _ =>
+                {
+                    // 통계 버튼 클릭 시 동작
+                    if (statisticsWindow.IsVisible)
                     {
-                        // 통계 버튼 클릭 시 동작
-                        if (statisticsWindow != null && statisticsWindow.IsVisible)
-                        {
-                            statisticsWindow.Activate(); // 이미 열려있다면 창을 활성화
-                        }
-                        else
-                        {
-                            statisticsWindow = new StatisticsWindow();
-                            statisticsWindow.Show(); // 열려있지 않다면 창을 엶
-                        }
-                    },
-                    canExecuteFunc: _ => true
+                        statisticsWindow.Activate(); // 이미 열려있다면 창을 활성화
+                    }
+                    else
+                    {
+                        statisticsWindow.Show(); // 열려있지 않다면 창을 엶
+                    }
+                },
+                canExecuteFunc: _ => true
             );
 
             TotalTimeSeriesCollection = new SeriesCollection();
@@ -212,6 +217,12 @@ namespace WorkWatcher.ViewModels
             });
         }
 
+        ~MainViewModel()
+        {
+            _monitoringSession.PropertyChanged -= OnUpdateSessionData;
+            // 뷰모델이 소멸될 때 세션이 활성화되어 있으면 종료
+        }
+
         private void SetupChart()
         {
             // 작업 시간 차트와 딴짓 시간 차트 초기화
@@ -220,7 +231,7 @@ namespace WorkWatcher.ViewModels
             {
                 WorkTimeSeriesCollection.Add(new LiveCharts.Wpf.PieSeries
                 {
-                    Title = program.ProcessName,
+                    Title = program,
                     Values = new ChartValues<double> { 0 },
                     DataLabels = true
                 });
@@ -261,47 +272,30 @@ namespace WorkWatcher.ViewModels
                         if (RemainDistractTime < TimeSpan.Zero) RemainDistractTime = TimeSpan.Zero;
                         RDT_Text = $"{RemainDistractTime.Hours:D2}:{RemainDistractTime.Minutes:D2}:{RemainDistractTime.Seconds:D2}";
                         break;
-                    case nameof(MonitoringSession.ProgramUsage):
-                        UpdateProgramUsageCharts();
-                        break;
                 }
 
-                TotalTimeSeriesCollection[0].Values[0] = MonitoringSession.TotalWorkTime.TotalSeconds;
-                TotalTimeSeriesCollection[1].Values[0] = MonitoringSession.TotalDistractionTime.TotalSeconds;
-                TotalTimeSeriesCollection[2].Values[0] = MonitoringSession.TotalComputerTime.TotalSeconds - MonitoringSession.TotalWorkTime.TotalSeconds - MonitoringSession.TotalDistractionTime.TotalSeconds;
+                UpdateProgramUsageCharts();
+                TotalTimeSeriesCollection[0].Values[0] = Math.Round(MonitoringSession.TotalWorkTime.TotalSeconds, 2);
+                TotalTimeSeriesCollection[1].Values[0] = Math.Round(MonitoringSession.TotalDistractionTime.TotalSeconds, 2);
+                TotalTimeSeriesCollection[2].Values[0] = Math.Round(MonitoringSession.TotalComputerTime.TotalSeconds - MonitoringSession.TotalWorkTime.TotalSeconds - MonitoringSession.TotalDistractionTime.TotalSeconds, 2);
             });
         }
 
         private void UpdateProgramUsageCharts()
         {
-            if (sessionManagementService._monitoredPrograms == null || sessionManagementService._distractionPrograms == null)
+            if (sessionManagementService.currentSession.WorkPrograms == null ||
+                sessionManagementService.currentSession.WorkPrograms.Count == 0 ||
+                sessionManagementService.currentSession.DistractionPrograms == null ||
+                sessionManagementService.currentSession.DistractionPrograms.Count == 0)
                 return;
-
-            // 작업 프로그램 차트 업데이트
-            var workPrograms = MonitoringSession.ProgramUsage
-                .Where(p => sessionManagementService._monitoredPrograms.ContainsKey(p.Key))
-                .ToList();
 
             foreach (var series in WorkTimeSeriesCollection)
             {
-                var program = workPrograms.FirstOrDefault(p => p.Key == series.Title);
-                if (program.Key != null)
-                {
-                    series.Values[0] = program.Value.TotalSeconds;
-                }
+                series.Values[0] = Math.Round(sessionManagementService.currentSession.WorkPrograms[series.Title].TotalSeconds, 2);
             }
-
-            // 딴짓 프로그램 차트 업데이트
-            var distractionPrograms = MonitoringSession.ProgramUsage
-                .Where(p => sessionManagementService._distractionPrograms.ContainsKey(p.Key))
-                .ToList();
             foreach (var series in DistractTimeSeriesCollection)
             {
-                var program = distractionPrograms.FirstOrDefault(p => p.Key == series.Title);
-                if (program.Key != null)
-                {
-                    series.Values[0] = program.Value.TotalSeconds;
-                }
+                series.Values[0] = Math.Round(sessionManagementService.currentSession.DistractionPrograms[series.Title].TotalSeconds, 2);
             }
         }
 
@@ -317,6 +311,7 @@ namespace WorkWatcher.ViewModels
             }
             else
             {
+                settingsWindow.Hide(); // 세션 시작 시 설정 창 숨김
                 bool confirmStart = MessageBox.Show("새 세션을 시작하시겠습니까?\n강한 감시 상태인 프로그램이 모두 종료됩니다.", "세션 시작 확인", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
                 if (confirmStart)
                 {
