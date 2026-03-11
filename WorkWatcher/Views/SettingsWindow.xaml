@@ -46,7 +46,8 @@
 
 
         <Label Content="할당량 설정" HorizontalAlignment="Left" Margin="400,10,0,0" VerticalAlignment="Top" FontSize="18"/>
-        <TextBox HorizontalAlignment="Left" 
+        <TextBox PreviewTextInput="NumberValidationTextBox" 
+                 HorizontalAlignment="Left" 
                  Margin="400,49,0,0" 
                  TextWrapping="Wrap" 
                  Text="{Binding QuotaHours, UpdateSourceTrigger=PropertyChanged}" 
@@ -55,7 +56,8 @@
                  HorizontalContentAlignment="Center" 
                  VerticalContentAlignment="Center"/>
         <Label Content="시간" HorizontalAlignment="Left" Margin="445,45,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <TextBox HorizontalAlignment="Left" 
+        <TextBox PreviewTextInput="NumberValidationTextBox"
+                 HorizontalAlignment="Left" 
                  Margin="484,49,0,0" 
                  TextWrapping="Wrap" 
                  Text="{Binding QuotaMinutes, UpdateSourceTrigger=PropertyChanged}" 
@@ -66,7 +68,8 @@
         <Label Content="분" HorizontalAlignment="Left" Margin="529,45,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 
         <Label Content="딴짓 허용 시간 설정" HorizontalAlignment="Left" Margin="400,107,0,0" VerticalAlignment="Top" FontSize="18"/>
-        <TextBox HorizontalAlignment="Left" 
+        <TextBox PreviewTextInput="NumberValidationTextBox"
+                 HorizontalAlignment="Left" 
                  Margin="400,146,0,0" 
                  TextWrapping="Wrap" 
                  Text="{Binding PunishmentHours, UpdateSourceTrigger=PropertyChanged}" 
@@ -75,7 +78,8 @@
                  HorizontalContentAlignment="Center" 
                  VerticalContentAlignment="Center"/>
         <Label Content="시간" HorizontalAlignment="Left" Margin="445,142,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <TextBox HorizontalAlignment="Left" 
+        <TextBox PreviewTextInput="NumberValidationTextBox"
+                 HorizontalAlignment="Left" 
                  Margin="484,146,0,0" 
                  TextWrapping="Wrap" 
                  Text="{Binding PunishmentMinutes, UpdateSourceTrigger=PropertyChanged}" 

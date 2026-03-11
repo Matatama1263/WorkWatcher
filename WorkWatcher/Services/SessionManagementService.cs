@@ -148,6 +148,9 @@ namespace WorkWatcher.Services
             {
                 currentSession.ProgramUsage[e.ProcessName] = e.Duration;
             }
+
+            // ProgramUsage가 변경되었음을 알림
+            currentSession.OnPropertyChanged(nameof(currentSession.ProgramUsage));
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Input;
 using WorkWatcher.Models;
 using WorkWatcher.ViewModels;
 
@@ -16,6 +18,13 @@ namespace WorkWatcher.Views
         public SettingsWindow()
         {
             InitializeComponent();
+        }
+
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            // 정규식을 사용하여 숫자(0-9)만 허용
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
         }
 
         private void Add_MP_FP_Click(object sender, RoutedEventArgs e)

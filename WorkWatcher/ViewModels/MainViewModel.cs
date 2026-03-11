@@ -194,45 +194,114 @@ namespace WorkWatcher.ViewModels
             TotalTimeSeriesCollection = new SeriesCollection();
             TotalTimeSeriesCollection.Add(new LiveCharts.Wpf.PieSeries
             {
-                Title = "전체 시간 비율",
-                Values = new ChartValues<double> { 0 },
-                DataLabels = true
-            });
-            WorkTimeSeriesCollection = new SeriesCollection();
-            WorkTimeSeriesCollection.Add(new LiveCharts.Wpf.PieSeries
-            {
                 Title = "작업 시간",
                 Values = new ChartValues<double> { 0 },
                 DataLabels = true
             });
-            DistractTimeSeriesCollection = new SeriesCollection();
-            DistractTimeSeriesCollection.Add(new LiveCharts.Wpf.PieSeries
+            TotalTimeSeriesCollection.Add(new LiveCharts.Wpf.PieSeries
             {
                 Title = "딴짓 시간",
                 Values = new ChartValues<double> { 0 },
                 DataLabels = true
             });
+            TotalTimeSeriesCollection.Add(new LiveCharts.Wpf.PieSeries
+            {
+                Title = "기타",
+                Values = new ChartValues<double> { 0 },
+                DataLabels = true
+            });
+        }
+
+        private void SetupChart()
+        {
+            // 작업 시간 차트와 딴짓 시간 차트 초기화
+            WorkTimeSeriesCollection = new SeriesCollection();
+            foreach (var program in appSettings.MonitoredPrograms)
+            {
+                WorkTimeSeriesCollection.Add(new LiveCharts.Wpf.PieSeries
+                {
+                    Title = program.ProcessName,
+                    Values = new ChartValues<double> { 0 },
+                    DataLabels = true
+                });
+            }
+
+
+            DistractTimeSeriesCollection = new SeriesCollection();
+            foreach (var program in appSettings.DistractionPrograms)
+            {
+                DistractTimeSeriesCollection.Add(new LiveCharts.Wpf.PieSeries
+                {
+                    Title = program.ProcessName,
+                    Values = new ChartValues<double> { 0 },
+                    DataLabels = true
+                });
+            }
         }
 
         private void OnUpdateSessionData(object? sender, PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
+            // UI 스레드에서 실행되도록 보장
+            System.Windows.Application.Current?.Dispatcher.Invoke(() =>
             {
-                case nameof(MonitoringSession.TotalComputerTime):
-                    TCT_Text = $"{MonitoringSession.TotalComputerTime.Hours:D2}:{MonitoringSession.TotalComputerTime.Minutes:D2}:{MonitoringSession.TotalComputerTime.Seconds:D2}";
-                    break;
-                case nameof(MonitoringSession.TotalWorkTime):
-                    TWT_Text = $"{MonitoringSession.TotalWorkTime.Hours:D2}:{MonitoringSession.TotalWorkTime.Minutes:D2}:{MonitoringSession.TotalWorkTime.Seconds:D2}";
-                    RemainQuotaTime = MonitoringSession.SessionQuota.QuotaTime - MonitoringSession.TotalWorkTime; // 남은 쿼터 시간 업데이트
-                    if (RemainQuotaTime < TimeSpan.Zero) RemainQuotaTime = TimeSpan.Zero; // 남은 시간이 음수로 표시되지 않도록 처리
-                    RQT_Text = $"{RemainQuotaTime.Hours:D2}:{RemainQuotaTime.Minutes:D2}:{RemainQuotaTime.Seconds:D2}";
-                    break;
-                case nameof(MonitoringSession.TotalDistractionTime):
-                    TDT_Text = $"{MonitoringSession.TotalDistractionTime.Hours:D2}:{MonitoringSession.TotalDistractionTime.Minutes:D2}:{MonitoringSession.TotalDistractionTime.Seconds:D2}";
-                    RemainDistractTime = MonitoringSession.SessionQuota.PunishmentThreshold - MonitoringSession.TotalDistractionTime; // 남은 방해 시간 업데이트
-                    if (RemainDistractTime < TimeSpan.Zero) RemainDistractTime = TimeSpan.Zero; // 남은 시간이 음수로 표시되지 않도록 처리
-                    RDT_Text = $"{RemainDistractTime.Hours:D2}:{RemainDistractTime.Minutes:D2}:{RemainDistractTime.Seconds:D2}";
-                    break;
+                switch (e.PropertyName)
+                {
+                    case nameof(MonitoringSession.TotalComputerTime):
+                        TCT_Text = $"{MonitoringSession.TotalComputerTime.Hours:D2}:{MonitoringSession.TotalComputerTime.Minutes:D2}:{MonitoringSession.TotalComputerTime.Seconds:D2}";
+                        break;
+                    case nameof(MonitoringSession.TotalWorkTime):
+                        TWT_Text = $"{MonitoringSession.TotalWorkTime.Hours:D2}:{MonitoringSession.TotalWorkTime.Minutes:D2}:{MonitoringSession.TotalWorkTime.Seconds:D2}";
+                        RemainQuotaTime = MonitoringSession.SessionQuota.QuotaTime - MonitoringSession.TotalWorkTime;
+                        if (RemainQuotaTime < TimeSpan.Zero) RemainQuotaTime = TimeSpan.Zero;
+                        RQT_Text = $"{RemainQuotaTime.Hours:D2}:{RemainQuotaTime.Minutes:D2}:{RemainQuotaTime.Seconds:D2}";
+                        break;
+                    case nameof(MonitoringSession.TotalDistractionTime):
+                        TDT_Text = $"{MonitoringSession.TotalDistractionTime.Hours:D2}:{MonitoringSession.TotalDistractionTime.Minutes:D2}:{MonitoringSession.TotalDistractionTime.Seconds:D2}";
+                        RemainDistractTime = MonitoringSession.SessionQuota.PunishmentThreshold - MonitoringSession.TotalDistractionTime;
+                        if (RemainDistractTime < TimeSpan.Zero) RemainDistractTime = TimeSpan.Zero;
+                        RDT_Text = $"{RemainDistractTime.Hours:D2}:{RemainDistractTime.Minutes:D2}:{RemainDistractTime.Seconds:D2}";
+                        break;
+                    case nameof(MonitoringSession.ProgramUsage):
+                        UpdateProgramUsageCharts();
+                        break;
+                }
+
+                TotalTimeSeriesCollection[0].Values[0] = MonitoringSession.TotalWorkTime.TotalSeconds;
+                TotalTimeSeriesCollection[1].Values[0] = MonitoringSession.TotalDistractionTime.TotalSeconds;
+                TotalTimeSeriesCollection[2].Values[0] = MonitoringSession.TotalComputerTime.TotalSeconds - MonitoringSession.TotalWorkTime.TotalSeconds - MonitoringSession.TotalDistractionTime.TotalSeconds;
+            });
+        }
+
+        private void UpdateProgramUsageCharts()
+        {
+            if (sessionManagementService._monitoredPrograms == null || sessionManagementService._distractionPrograms == null)
+                return;
+
+            // 작업 프로그램 차트 업데이트
+            var workPrograms = MonitoringSession.ProgramUsage
+                .Where(p => sessionManagementService._monitoredPrograms.ContainsKey(p.Key))
+                .ToList();
+
+            foreach (var series in WorkTimeSeriesCollection)
+            {
+                var program = workPrograms.FirstOrDefault(p => p.Key == series.Title);
+                if (program.Key != null)
+                {
+                    series.Values[0] = program.Value.TotalSeconds;
+                }
+            }
+
+            // 딴짓 프로그램 차트 업데이트
+            var distractionPrograms = MonitoringSession.ProgramUsage
+                .Where(p => sessionManagementService._distractionPrograms.ContainsKey(p.Key))
+                .ToList();
+            foreach (var series in DistractTimeSeriesCollection)
+            {
+                var program = distractionPrograms.FirstOrDefault(p => p.Key == series.Title);
+                if (program.Key != null)
+                {
+                    series.Values[0] = program.Value.TotalSeconds;
+                }
             }
         }
 
@@ -248,7 +317,7 @@ namespace WorkWatcher.ViewModels
             }
             else
             {
-                bool confirmStart = MessageBox.Show("새 세션을 시작하시겠습니까?", "세션 시작 확인", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+                bool confirmStart = MessageBox.Show("새 세션을 시작하시겠습니까?\n강한 감시 상태인 프로그램이 모두 종료됩니다.", "세션 시작 확인", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
                 if (confirmStart)
                 {
                     appSettings = DataStorageService.LoadSettings();
@@ -258,6 +327,7 @@ namespace WorkWatcher.ViewModels
                     }
                     else
                     {
+                        SetupChart();
                         sessionManagementService.StartNewSession(appSettings);
                     }
                 }
