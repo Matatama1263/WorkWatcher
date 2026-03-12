@@ -30,5 +30,14 @@ namespace WorkWatcher.Views
             e.Cancel = true; // 창이 실제로 닫히는 것을 취소
             this.Hide();     // 대신 숨김
         }
+
+        private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = DataContext as ViewModels.StatisticsViewModel;
+            if (viewModel != null)
+            {
+                viewModel.SortSessions();
+            }
+        }
     }
 }

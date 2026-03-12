@@ -83,6 +83,18 @@ namespace WorkWatcher.Services
 
             processMonitor.StopTracking();
 
+            Statistics stats = DataStorageService.LoadStatistics();
+
+            stats.TotalWorkTime += currentSession.TotalWorkTime;
+            stats.TotalDistractionTime += currentSession.TotalDistractionTime;
+            stats.TotalComputerTime += currentSession.TotalComputerTime;
+            stats.TotalSessionsCount += 1;
+            if (currentSession.SessionQuota.QuotaMet)
+                stats.QuotaMetCount += 1;
+            if (currentSession.SessionQuota.Punishmented)
+                stats.PunishmentCount += 1;
+
+            DataStorageService.SaveStatistics(stats);
             DataStorageService.SaveSession(currentSession);
 
             isSessionActive = false;

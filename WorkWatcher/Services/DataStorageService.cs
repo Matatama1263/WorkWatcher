@@ -9,6 +9,7 @@ namespace WorkWatcher.Services
     public static class DataStorageService
     {
         private static readonly string _dataDirectory;
+        private static readonly string _statisticsFile;
         private static readonly string _sessionsFile;
         private static readonly string _settingsFile;
         static DataStorageService()
@@ -17,6 +18,7 @@ namespace WorkWatcher.Services
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "WorkWatcher"
             );
+            _statisticsFile = Path.Combine(_dataDirectory, "statistics.json");
             _sessionsFile = Path.Combine(_dataDirectory, "sessions.json");
             _settingsFile = Path.Combine(_dataDirectory, "settings.json");
 
@@ -26,9 +28,40 @@ namespace WorkWatcher.Services
             }
         }
 
+        public static void SaveStatistics(Statistics stats)
+        {
+            var json = JsonSerializer.Serialize(stats, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            File.WriteAllText(_statisticsFile, json);
+        }
+
+        public static Statistics LoadStatistics()
+        {
+            if (!File.Exists(_statisticsFile))
+            {
+                return new Statistics();
+            }
+            var json = File.ReadAllText(_statisticsFile);
+            return JsonSerializer.Deserialize<Statistics>(json) ?? new Statistics();
+        }
+
         public static void SaveSession(MonitoringSession session)
         {
             var sessions = LoadAllSessions();
+            // 세션의 시간 데이터들의 소수점 이하를 제거하여 저장
+            session.TotalWorkTime = TimeSpan.FromSeconds(Math.Floor(session.TotalWorkTime.TotalSeconds));
+            session.TotalDistractionTime = TimeSpan.FromSeconds(Math.Floor(session.TotalDistractionTime.TotalSeconds));
+            session.TotalComputerTime = TimeSpan.FromSeconds(Math.Floor(session.TotalComputerTime.TotalSeconds));
+            foreach (var program in session.WorkPrograms)
+            {
+                session.WorkPrograms[program.Key] = TimeSpan.FromSeconds(Math.Floor(program.Value.TotalSeconds));
+            }
+            foreach (var program in session.DistractionPrograms)
+            {
+                session.DistractionPrograms[program.Key] = TimeSpan.FromSeconds(Math.Floor(program.Value.TotalSeconds));
+            }
             sessions.Add(session);
 
             var json = JsonSerializer.Serialize(sessions, new JsonSerializerOptions
