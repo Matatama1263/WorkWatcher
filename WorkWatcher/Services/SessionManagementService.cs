@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using WorkWatcher.Models;
 
 namespace WorkWatcher.Services
 {
-    public class SessionManagementService
+    public class SessionManagementService : IDisposable
     {
         public MonitoringSession currentSession;
         ProcessMonitorService processMonitor;
@@ -31,6 +32,17 @@ namespace WorkWatcher.Services
             processMonitor.ProcessActivityDetected += OnProcessActivityDetected;
         }
 
+        public void Dispose()
+        {
+            if (processMonitor != null)
+            {
+                processMonitor.ProcessActivityDetected -= OnProcessActivityDetected;
+                processMonitor.Dispose();
+            }
+
+            blocker?.Dispose();
+        }
+
         // 방해 프로그램 리스트 설정 메서드
         public void SetDistractionPrograms(Dictionary<string, DistractionProgramInfo> programs)
         {
@@ -48,15 +60,16 @@ namespace WorkWatcher.Services
             currentSession.StartTime = DateTime.Now;
 
 
-            currentSession.WorkPrograms = new Dictionary<string, TimeSpan>();
+            currentSession.WorkPrograms.Clear();
             foreach (var program in appSettings.MonitoredPrograms)
             {
-                currentSession.WorkPrograms.Add(program, TimeSpan.Zero);
+                currentSession.WorkPrograms[program] = TimeSpan.Zero;
             }
-            currentSession.DistractionPrograms = new Dictionary<string, TimeSpan>();
+            
+            currentSession.DistractionPrograms.Clear();
             foreach (var program in appSettings.DistractionPrograms)
             {
-                currentSession.DistractionPrograms.Add(program.ProcessName, TimeSpan.Zero);
+                currentSession.DistractionPrograms[program.ProcessName] = TimeSpan.Zero;
             }
             SetDistractionPrograms(appSettings.DistractionPrograms.ToDictionary(p => p.ProcessName));
 
@@ -124,6 +137,8 @@ namespace WorkWatcher.Services
                     (!currentSession.SessionQuota.PunishmentActive) &&
                     currentSession.TotalDistractionTime >= currentSession.SessionQuota.PunishmentThreshold)
                 {
+                    MessageBox.Show("허용된 딴짓 시간을 모두 소모했습니다. 할당량을 전부 채울 때 까지 모든 딴짓 프로그램이 차단됩니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
+
                     // 모든 방해 프로그램 차단
                     blocker.KillBlockedProcesses(_distractionPrograms.Keys.ToList());
                     blocker.SetBlockedProcesses(_distractionPrograms.Keys.ToList());

@@ -4,8 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WorkWatcher.Views"
-        xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels"
-        
+        xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
         Closing="Window_Closing"
         Title="통계" Height="600" Width="1000" MinHeight="600" MinWidth="1000">
@@ -21,11 +20,11 @@
             <ColumnDefinition Width="140" MinWidth="140"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ListView SelectedItem="{Binding SelectedSession}" Margin="10,10,10,10" Grid.Column="0">
+        <ListView ItemsSource="{Binding Sessions}" SelectedItem="{Binding SelectedSession}" Margin="10,10,10,10" Grid.Column="0">
             <ListView.View>
                 <GridView>
                     <!-- 년-월-일/시:분:초 형식으로 표시 -->
-                    <GridViewColumn Header="세션 목록" DisplayMemberBinding="{Binding EndTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}">
+                    <GridViewColumn Header="세션 기록" DisplayMemberBinding="{Binding EndTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}">
                         <GridViewColumn.HeaderContainerStyle>
                             <Style TargetType="GridViewColumnHeader">
                                 <EventSetter Event="Click" Handler="GridViewColumnHeader_Click"/>
@@ -38,34 +37,67 @@
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="200" MaxHeight="200"/>
+                <RowDefinition Height="1" MaxHeight="1"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Label Content="전체 통계" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22" Grid.Row="0"/>
-            
-            <Label Content="세션 통계" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22" Grid.Row="1"/>
-            <Label Content="시작 시간" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.StartTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}" HorizontalAlignment="Right" Margin="0,54,0,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="종료 시간" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.EndTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}" HorizontalAlignment="Right" Margin="0,88,0,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="총 세션 시간" HorizontalAlignment="Left" Margin="10,122,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.TotalComputerTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,122,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="작업 시간" HorizontalAlignment="Left" Margin="10,156,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.TotalWorkTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,156,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="설정한 할당량" HorizontalAlignment="Left" Margin="10,190,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.SessionQuota.QuotaTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,190,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="할당량 달성 여부" HorizontalAlignment="Left" Margin="10,224,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.SessionQuota.QuotaMet, Converter={StaticResource BoolToYesNoConverter}}" HorizontalAlignment="Right" Margin="0,224,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="딴짓 시간" HorizontalAlignment="Left" Margin="10,258,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.TotalDistractionTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,258,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="설정한 딴짓 허용 시간" HorizontalAlignment="Left" Margin="10,292,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.SessionQuota.PunishmentThreshold, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,292,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="처벌 여부" HorizontalAlignment="Left" Margin="10,326,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1"/>
-            <Label Content="{Binding SelectedSession.SessionQuota.Punishmented, Converter={StaticResource BoolToYesNoConverter}}" HorizontalAlignment="Right" Margin="0,326,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="1"/>
+            <Label Content="총 세션 수" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="0"/>
+            <Label Content="{Binding Statistics.TotalSessionsCount}" HorizontalAlignment="Right" Margin="0,54,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="0"/>
+            <Label Content="총 가동 시간" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="0"/>
+            <Label Content="{Binding Statistics.TotalComputerTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,88,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="0"/>
+            <Label Content="총 작업 시간" HorizontalAlignment="Left" Margin="10,122,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="0"/>
+            <Label Content="{Binding Statistics.TotalWorkTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,122,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="0"/>
+            <Label Content="총 딴짓 시간" HorizontalAlignment="Left" Margin="10,156,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="0"/>
+            <Label Content="{Binding Statistics.TotalDistractionTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,156,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="0"/>
+            <Label Content="할당량 달성 횟수" HorizontalAlignment="Left" Margin="10,122,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="0" Grid.Column="1"/>
+            <Label Content="{Binding Statistics.QuotaMetCount}" HorizontalAlignment="Right" Margin="0,122,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="0" Grid.Column="1"/>
+            <Label Content="처벌 발동 횟수" HorizontalAlignment="Left" Margin="10,156,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="0" Grid.Column="1"/>
+            <Label Content="{Binding Statistics.PunishmentCount}" HorizontalAlignment="Right" Margin="0,156,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="0" Grid.Column="1"/>
+
+            <Border BorderBrush="Black" BorderThickness="1" Grid.Column="0" Grid.Row="1"/>
+            <Border BorderBrush="Black" BorderThickness="1" Grid.Column="1" Grid.Row="1"/>
+            <Border BorderBrush="Black" BorderThickness="1" Grid.Column="2" Grid.Row="1"/>
+            <Border BorderBrush="Black" BorderThickness="1" Grid.Column="3" Grid.Row="1"/>
+
+            <Label Content="세션 통계" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22" Grid.Row="2"/>
+            <Label Content="시작 시각" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.StartTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}" HorizontalAlignment="Right" Margin="0,54,0,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="종료 시각" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.EndTime, StringFormat=\{0:yyyy-MM-dd HH:mm\}}" HorizontalAlignment="Right" Margin="0,88,0,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="세션 시간" HorizontalAlignment="Left" Margin="10,122,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.TotalComputerTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,122,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="작업 시간" HorizontalAlignment="Left" Margin="10,156,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.TotalWorkTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,156,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="설정한 할당량" HorizontalAlignment="Left" Margin="10,190,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.SessionQuota.QuotaTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,190,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="할당량 달성 여부" HorizontalAlignment="Left" Margin="10,224,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.SessionQuota.QuotaMet, Converter={StaticResource BoolToYesNoConverter}}" HorizontalAlignment="Right" Margin="0,224,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="딴짓 시간" HorizontalAlignment="Left" Margin="10,258,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.TotalDistractionTime, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,258,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="딴짓 허용 시간" HorizontalAlignment="Left" Margin="10,292,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.SessionQuota.PunishmentThreshold, StringFormat=\{0:hh\\:mm\\:ss\}}" HorizontalAlignment="Right" Margin="0,292,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="처벌 발동 여부" HorizontalAlignment="Left" Margin="10,326,0,0" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label Content="{Binding SelectedSession.SessionQuota.Punishmented, Converter={StaticResource BoolToYesNoConverter}}" HorizontalAlignment="Right" Margin="0,326,10,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Grid.Row="2"/>
+
+
+            <Label Content="총 시간 비율" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="15" Grid.Row="0" Grid.Column="2"/>
+            <lvc:PieChart Grid.Row="0" Grid.Column="2" Margin="5, 40, 5, 5" Series="{Binding StatisticsTTRCollection}" LegendLocation="Bottom"/>
+            <Label Content="할당량 달성률" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="15" Grid.Row="0" Grid.Column="3"/>
+            <lvc:PieChart Grid.Row="0" Grid.Column="3" Margin="5, 40, 5, 5" Series="{Binding StatisticsQCRCollection}" LegendLocation="Bottom"/>
+
+            <Label Content="총 시간 비율" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22" Grid.Row="2" Grid.Column="1"/>
+            <lvc:PieChart Grid.Row="2" Grid.Column="1" Margin="5" Series="{Binding SelectedSessionTTRCollection}" LegendLocation="Bottom"/>
+            <Label Content="작업 시간 비율" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22" Grid.Row="2" Grid.Column="2"/>
+            <lvc:PieChart Grid.Row="2" Grid.Column="2" Margin="5" Series="{Binding SelectedSessionWPTCollection}" LegendLocation="Bottom"/>
+            <Label Content="딴짓 시간 비율" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22" Grid.Row="2" Grid.Column="3"/>
+            <lvc:PieChart Grid.Row="2" Grid.Column="3" Margin="5" Series="{Binding SelectedSessionDPTCollection}" LegendLocation="Bottom"/>
+
         </Grid>
     </Grid>
 </Window>

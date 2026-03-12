@@ -7,8 +7,10 @@ using System.Management;
 
 namespace WorkWatcher.Services
 {
-    public class ProcessBlockerService
+    public class ProcessBlockerService : IDisposable
     {
+        private bool _disposed = false;
+
         private HashSet<string> _blockedProcesses;
         public bool isActive;
         ManagementEventWatcher watcher;
@@ -30,6 +32,29 @@ namespace WorkWatcher.Services
                     KillProcess(processName);
             };
             watcher.Start();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (watcher != null)
+                    {
+                        watcher.Stop();
+                        watcher.Dispose();
+                        watcher = null;
+                    }
+                }
+                _disposed = true;
+            }
         }
 
         ~ProcessBlockerService()
@@ -61,23 +86,6 @@ namespace WorkWatcher.Services
             }
         }
 
-        public void KillProcess(string processName)
-        {
-            var processes = Process.GetProcessesByName(processName);
-            foreach (var process in processes)
-            {
-                try
-                {
-                    process.Kill();
-                }
-                catch (Exception ex)
-                {
-                    // 예외 처리 (예: 권한 문제)
-                    Console.WriteLine($"Failed to kill process {processName}: {ex.Message}");
-                }
-            }
-        }
-
         public void KillBlockedProcesses(List<string> processNames)
         {
             foreach (var name in processNames)
@@ -87,13 +95,34 @@ namespace WorkWatcher.Services
                 {
                     try
                     {
-                        process.Kill();
+                        using (process)
+                        {
+                            process.Kill();
+                        }
                     }
                     catch (Exception ex)
                     {
-                        // 예외 처리 (예: 권한 문제)
                         Console.WriteLine($"Failed to kill process {name}: {ex.Message}");
                     }
+                }
+            }
+        }
+
+        public void KillProcess(string processName)
+        {
+            var processes = Process.GetProcessesByName(processName);
+            foreach (var process in processes)
+            {
+                try
+                {
+                    using (process)
+                    {
+                        process.Kill();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to kill process {processName}: {ex.Message}");
                 }
             }
         }

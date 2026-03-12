@@ -13,7 +13,7 @@ using WorkWatcher.Views;
 
 namespace WorkWatcher.ViewModels
 {
-    public class MainViewModel : Model
+    public class MainViewModel : Model, IDisposable
     {
         private AppSettings appSettings;
 
@@ -217,10 +217,19 @@ namespace WorkWatcher.ViewModels
             });
         }
 
+        public void Dispose()
+        {
+            if (_monitoringSession != null)
+            {
+                _monitoringSession.PropertyChanged -= OnUpdateSessionData;
+            }
+
+            sessionManagementService?.Dispose();
+        }
+
         ~MainViewModel()
         {
-            _monitoringSession.PropertyChanged -= OnUpdateSessionData;
-            // 뷰모델이 소멸될 때 세션이 활성화되어 있으면 종료
+            Dispose();
         }
 
         private void SetupChart()
@@ -307,6 +316,7 @@ namespace WorkWatcher.ViewModels
                 if (confirmEnd)
                 {
                     sessionManagementService.EndCurrentSession();
+                    statisticsWindow.UpdateStatistics(); // 세션 종료 후 통계 창 업데이트
                 }
             }
             else

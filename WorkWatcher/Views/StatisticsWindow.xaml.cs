@@ -39,5 +39,15 @@ namespace WorkWatcher.Views
                 viewModel.SortSessions();
             }
         }
+
+        internal void UpdateStatistics()
+        {
+            var viewModel = DataContext as ViewModels.StatisticsViewModel;
+            if (viewModel != null)
+            {
+                viewModel.LoadStatistics();
+                viewModel.LoadSessions();
+            }
+        }
     }
 }
