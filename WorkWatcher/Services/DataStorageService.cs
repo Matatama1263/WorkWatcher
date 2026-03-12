@@ -30,6 +30,7 @@ namespace WorkWatcher.Services
 
         public static void SaveStatistics(Statistics stats)
         {
+            // 세션의 시간 데이터들의 소수점 이하를 제거하여 저장
             stats.TotalWorkTime = TimeSpan.FromSeconds(Math.Floor(stats.TotalWorkTime.TotalSeconds));
             stats.TotalDistractionTime = TimeSpan.FromSeconds(Math.Floor(stats.TotalDistractionTime.TotalSeconds));
             stats.TotalComputerTime = TimeSpan.FromSeconds(Math.Floor(stats.TotalComputerTime.TotalSeconds));
@@ -38,7 +39,6 @@ namespace WorkWatcher.Services
             {
                 WriteIndented = true
             });
-            // 세션의 시간 데이터들의 소수점 이하를 제거하여 저장
 
             File.WriteAllText(_statisticsFile, json);
         }
