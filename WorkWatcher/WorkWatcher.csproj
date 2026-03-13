@@ -7,6 +7,9 @@
     <UseWPF>true</UseWPF>
     <LangVersion>12.0</LangVersion>
     
+    <!-- 애플리케이션 매니페스트 설정 -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    
     <!-- 버전 정보 추가 -->
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0</AssemblyVersion>

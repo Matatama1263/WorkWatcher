@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
@@ -36,6 +37,15 @@ namespace WorkWatcher
 
         protected override void OnExit(ExitEventArgs e)
         {
+            // 모든 윈도우의 리소스 정리
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.DataContext is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+
             _mutex?.ReleaseMutex();
             _mutex?.Dispose();
             base.OnExit(e);
