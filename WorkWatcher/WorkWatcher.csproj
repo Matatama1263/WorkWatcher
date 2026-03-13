@@ -4,9 +4,18 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <LangVersion>12.0</LangVersion>
+    
+    <!-- 버전 정보 추가 -->
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <Company>Matatama1263</Company>
+    <Product>WorkWatcher</Product>
+    <Copyright>Copyright © 2026</Copyright>
+    <Description>Windows용 작업 시간 모니터링 애플리케이션</Description>
+    <ApplicationIcon>Resources\powerButton.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,12 +23,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
-    <PackageReference Include="System.Management" Version="10.0.3" />
+    <Content Include="Resources\powerButton.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
+    <PackageReference Include="System.Management" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>

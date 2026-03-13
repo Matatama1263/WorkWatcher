@@ -19,7 +19,6 @@ namespace WorkWatcher.Services
         // 프로세스 차단 서비스
         public ProcessBlockerService blocker;
 
-        public bool isSessionActive;
 
         public SessionManagementService(MonitoringSession monitoringSession)
         {
@@ -84,8 +83,6 @@ namespace WorkWatcher.Services
             blocker.isActive = true;
 
             processMonitor.StartTracking();
-
-            isSessionActive = true;
         }
 
         public void EndCurrentSession()
@@ -109,8 +106,6 @@ namespace WorkWatcher.Services
 
             DataStorageService.SaveStatistics(stats);
             DataStorageService.SaveSession(currentSession);
-
-            isSessionActive = false;
         }
 
         // 프로세스 활동 감지 이벤트 핸들러

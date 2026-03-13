@@ -3,11 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WorkWatcher"
+        xmlns:local="clr-namespace:WorkWatcher.Views"
         xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
-        Title="WorkWatcher" Height="510" Width="320">
+        Title="WorkWatcher" Height="510" Width="320" Background="White">
+    <Window.Resources>
+        <local:BoolColorConverter x:Key="BoolColorConverter"/>
+    </Window.Resources>
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -69,8 +72,9 @@
                 </TabItem>
             </TabControl>
         </Border>
-        <Button Command="{Binding SessionSwitchButtonCommand}" HorizontalAlignment="Center" Margin="0,86,0,0" VerticalAlignment="Top" Height="100" Width="100" BorderBrush="{x:Null}" Cursor="Hand" Background="White">
-            <Image Source="/Views/powerButton.png"></Image>
+        <Ellipse HorizontalAlignment="Center" Height="150" Margin="0,61,0,0" VerticalAlignment="Top" Width="150" Fill="{Binding Path=IsSessionActive, Converter={StaticResource BoolColorConverter}}"/>
+        <Button Command="{Binding SessionSwitchButtonCommand}" HorizontalAlignment="Center" Margin="0,86,0,0" VerticalAlignment="Top" Height="100" Width="100" BorderBrush="{x:Null}" Cursor="Hand" Background="{Binding Path=IsSessionActive, Converter={StaticResource BoolColorConverter}}">
+            <Image Source="/Views/powerButton.png"/>
         </Button>
 
     </Grid>

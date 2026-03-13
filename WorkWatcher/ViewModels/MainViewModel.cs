@@ -19,11 +19,21 @@ namespace WorkWatcher.ViewModels
 
         private SessionManagementService sessionManagementService;
 
-
         private SettingsWindow settingsWindow;
         private StatisticsWindow statisticsWindow;
 
         #region 데이터 바인딩 속성, 커맨드 정의
+
+        private bool _isSessionActive;
+        public bool IsSessionActive
+        {
+            get => _isSessionActive;
+            set
+            {
+                _isSessionActive = value;
+                OnPropertyChanged(nameof(IsSessionActive));
+            }
+        }
 
         public Command SessionSwitchButtonCommand { get; set; }
         public Command SettingButtonCmd { get; set; }
@@ -177,7 +187,7 @@ namespace WorkWatcher.ViewModels
                         settingsWindow.Show(); // 같은 인스턴스 재사용
                     }
                 },
-                canExecuteFunc: _ => !sessionManagementService.isSessionActive
+                canExecuteFunc: _ => !IsSessionActive
             );
 
             StatisticsButtonCmd = new Command(
@@ -310,12 +320,13 @@ namespace WorkWatcher.ViewModels
 
         public void SessionSwitchButtonCommandExecute()
         {
-            if (sessionManagementService.isSessionActive)
+            if (IsSessionActive)
             {
                 bool confirmEnd = MessageBox.Show("현재 세션을 종료하시겠습니까?", "세션 종료 확인", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
                 if (confirmEnd)
                 {
                     sessionManagementService.EndCurrentSession();
+                    IsSessionActive = false;
                     statisticsWindow.UpdateStatistics(); // 세션 종료 후 통계 창 업데이트
                 }
             }
@@ -334,6 +345,7 @@ namespace WorkWatcher.ViewModels
                     {
                         SetupChart();
                         sessionManagementService.StartNewSession(appSettings);
+                        IsSessionActive = true;
                     }
                 }
             }

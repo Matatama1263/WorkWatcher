@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using WorkWatcher.Models;
+using System.Threading;
 
 namespace WorkWatcher.Services
 {

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WorkWatcher.Views"
         xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels"
         mc:Ignorable="d"
-        Title="FindProcessDialog" Height="400" Width="300" WindowStyle="ToolWindow" ResizeMode="NoResize">
+        Title="프로세스 찾기" Height="400" Width="300" WindowStyle="ToolWindow" ResizeMode="NoResize">
     <Window.DataContext>
         <ViewModels:FindProcessDialogViewModel/>
     </Window.DataContext>

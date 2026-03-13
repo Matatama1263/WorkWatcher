@@ -7,7 +7,7 @@
         xmlns:ViewModels="clr-namespace:WorkWatcher.ViewModels"
         mc:Ignorable="d"
         Closing="Window_Closing"
-        Title="SettingsWindow" Height="450" Width="800" WindowStyle="ToolWindow" ResizeMode="NoResize">
+        Title="설정" Height="450" Width="800" WindowStyle="ToolWindow" ResizeMode="NoResize">
     <Window.DataContext>
         <ViewModels:SettingsViewModel/>
     </Window.DataContext>

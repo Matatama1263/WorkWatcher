@@ -39,7 +39,7 @@ namespace WorkWatcher.Views
                 if (IsValidProcessName(selectedProcessName))
                 {
                     ViewModel.MonitoredPrograms.Add(selectedProcessName);
-                } else ProcessNameErrorMessage(selectedProcessName);
+                }
             }
         }
 
@@ -57,7 +57,7 @@ namespace WorkWatcher.Views
                 if (IsValidProcessName(fileName))
                 {
                     ViewModel.MonitoredPrograms.Add(fileName);
-                } else ProcessNameErrorMessage(fileName);
+                }
             }
         }
 
@@ -80,7 +80,7 @@ namespace WorkWatcher.Views
                 if (IsValidProcessName(selectedProcessName))
                 {
                     ViewModel.DistractionPrograms.Add(new DistractionProgramInfo { ProcessName = selectedProcessName });
-                } else ProcessNameErrorMessage(selectedProcessName);
+                }
             }
         }
 
@@ -98,7 +98,7 @@ namespace WorkWatcher.Views
                 if (IsValidProcessName(fileName))
                 {
                     ViewModel.DistractionPrograms.Add(new DistractionProgramInfo { ProcessName = fileName });
-                } else ProcessNameErrorMessage(fileName);
+                }
             }
         }
 
@@ -112,16 +112,32 @@ namespace WorkWatcher.Views
 
         private bool IsValidProcessName(string input)
         {
+            // 프로세스 명이 workwatcher.exe인 경우 허용하지 않음
+            if (string.Equals(input, "workwatcher", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("프로세스 이름 'workwatcher'은 허용되지 않습니다. 다른 프로세스를 선택해주세요.",
+                    "입력 오류",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return false;
+            }
+
             // 두 리스트중 하나라도 이미 존재하는지 확인
             foreach (var program in ViewModel.MonitoredPrograms)
             {
                 if (string.Equals(program, input, StringComparison.OrdinalIgnoreCase))
+                {
+                    ProcessNameErrorMessage(input);
                     return false;
+                }
             }
             foreach (var program in ViewModel.DistractionPrograms)
             {
                 if (string.Equals(program.ProcessName, input, StringComparison.OrdinalIgnoreCase))
+                {
+                    ProcessNameErrorMessage(input);
                     return false;
+                }
             }
             return true;
         }
