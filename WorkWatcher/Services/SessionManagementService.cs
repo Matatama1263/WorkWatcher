@@ -132,14 +132,14 @@ namespace WorkWatcher.Services
                     (!currentSession.SessionQuota.PunishmentActive) &&
                     currentSession.TotalDistractionTime >= currentSession.SessionQuota.PunishmentThreshold)
                 {
-                    MessageBox.Show("허용된 딴짓 시간을 모두 소모했습니다. 할당량을 전부 채울 때 까지 모든 딴짓 프로그램이 차단됩니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
-
                     // 모든 방해 프로그램 차단
                     blocker.KillBlockedProcesses(_distractionPrograms.Keys.ToList());
                     blocker.SetBlockedProcesses(_distractionPrograms.Keys.ToList());
 
                     currentSession.SessionQuota.PunishmentActive = true;
                     currentSession.SessionQuota.Punishmented = true;
+
+                    MessageBox.Show("허용된 딴짓 시간을 모두 소모했습니다. 할당량을 전부 채울 때 까지 모든 딴짓 프로그램이 차단됩니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             else if (currentSession.WorkPrograms.ContainsKey(e.ProcessName)) // 작업 프로그램인 경우
