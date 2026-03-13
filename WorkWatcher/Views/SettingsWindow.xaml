@@ -13,15 +13,14 @@
     </Window.DataContext>
     <Grid>
         <Label Content="작업 프로그램" HorizontalAlignment="Left" Margin="0,10,238,0" VerticalAlignment="Top" FontSize="18"/>
-        <DataGrid x:Name="MP_Grid" ItemsSource="{Binding MonitoredPrograms}" 
+        <DataGrid x:Name="MP_Grid" ItemsSource="{Binding MonitoredPrograms}"
                   AutoGenerateColumns="False"
                   Margin="10,49,0,235" 
                   HorizontalAlignment="Left" 
                   Width="380"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False">
+                  CanUserAddRows="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="프로그램 이름" Binding="{Binding}" Width="380"/>
+                <DataGridTextColumn Header="프로그램 이름" Binding="{Binding}" Width="380" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
         <Button Content="탐색기로 추가" Click="Add_MP_D_Click" HorizontalAlignment="Left" Margin="310,24,0,0" VerticalAlignment="Top"/>
@@ -29,15 +28,14 @@
         <Button Content="제거" Click="Remove_MP_Click" HorizontalAlignment="Left" Margin="140,24,0,0" VerticalAlignment="Top"/>
 
         <Label Content="딴짓 프로그램" HorizontalAlignment="Left" Margin="0,235,238,0" VerticalAlignment="Top" FontSize="18"/>
-        <DataGrid x:Name="DP_Grid" ItemsSource="{Binding DistractionPrograms}" 
+        <DataGrid x:Name="DP_Grid" ItemsSource="{Binding DistractionPrograms}"
                   AutoGenerateColumns="False"
                   Margin="10,274,0,10" 
                   HorizontalAlignment="Left" 
                   Width="380"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False">
+                  CanUserAddRows="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="프로그램 이름" Binding="{Binding ProcessName}" Width="300"/>
+                <DataGridTextColumn Header="프로그램 이름" Binding="{Binding ProcessName}" Width="300" IsReadOnly="True"/>
                 <DataGridCheckBoxColumn Header="강한 감시" Binding="{Binding StrictMonitoring}" Width="80"/>
             </DataGrid.Columns>
         </DataGrid>
